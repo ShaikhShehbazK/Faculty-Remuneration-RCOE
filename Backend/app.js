@@ -1,33 +1,50 @@
-import express from "express";
-import mongoose from "mongoose";
-import dotenv from "dotenv";
-import cors from "cors";
+//External Module
+const express = require("express");
+const cors = require("cors");
+require("dotenv").config();
+
+//local Module
+const mongoose = require("mongoose");
+const bodyParser = require("body-parser");
+
+// const userRouter = require("./routes/userRoute");
+// const candidateRouter = require("./routes/candidateRoute");
+const facultyAuthRoute = require("./routes/facultyAuthRoute");
+const adminAuthRoute = require("./routes/adminAuthRoute");
+const subjectRouter = require("./routes/subjectRoute");
+const facultyManagement = require("./routes/facultyManagement");
 
 const app = express();
 
-app.use(cors());
-app.use(express.json()); // Jo data aata hai usko json form me convert karta hai yeh command.
+// app.use(
+//   cors({
+//     origin: "https://jwtbased-website-e-voting.netlify.app", // ✅ your frontend URL
+//     credentials: true, // ✅ required for cookies
+//   })
+// );
 
-dotenv.config(); // Since port is a sensitve info so we keep it in a hidden file .env and to acces port from there we write this code.
-const PORT = process.env.PORT || 3000;
+app.use(express.json());
+app.use(express.urlencoded());
+app.use(bodyParser.urlencoded({ extended: true }));
 
-// Connect to MongoDb
-const URI = process.env.MongoDBURI;
+const MONGO_DB_URL = process.env.MONGO_URI;
 
-try {
-  mongoose.connect(URI, {
-    useNewUrlParser: true,
-    useUnifiedTopology: true,
+app.use("/faculty", facultyAuthRoute);
+app.use("/admin", adminAuthRoute);
+app.use("/subject", subjectRouter);
+app.use("/admin/faculty", facultyManagement);
+// app.use(userRouter);
+// app.use("/candidate", candidateRouter);
+
+const Port = process.env.port || 3003;
+mongoose
+  .connect(MONGO_DB_URL)
+  .then(() => {
+    console.log("Connected to MongoDB");
+    app.listen(Port, () => {
+      console.log(`server run on address http://localhost:${Port}`);
+    });
+  })
+  .catch((err) => {
+    console.log("Error while connecting to MongoDB", err);
   });
-  console.log("Connected to mongoDb");
-} catch (error) {
-  console.log("Error :", error);
-}
-
-// Defining routes
-
-
-
-app.listen(PORT, () => {
-  console.log(`Server is running on http://localhost:${PORT}`);
-});
