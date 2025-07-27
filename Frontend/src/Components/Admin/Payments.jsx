@@ -1,51 +1,54 @@
-import {Form, Button, Table, Row, Col, Container, Card, InputGroup} from "react-bootstrap";
-import {FaUserTie, FaMoneyCheckAlt, FaHistory, FaCheckCircle, FaUsers, FaChevronRight, FaSave, FaSyncAlt, FaFileInvoiceDollar} from "react-icons/fa";
+import { useState } from "react";
+import {Form, Button, Table, Row, Col, Container, Card, InputGroup, Offcanvas} from "react-bootstrap";
+import {FaSave, FaSyncAlt, FaFileInvoiceDollar, FaBars} from "react-icons/fa";
+import AdminSidebar from "../AdminSidebar";
 
-function AdminPaymentsPage() {
+function Payments() {
+  const [showSidebar, setShowSidebar] = useState(false);
+  const handleSidebarOpen = () => setShowSidebar(true);
+  const handleSidebarClose = () => setShowSidebar(false);
+
   return (
     <Container fluid className="p-4 bg-light min-vh-100">
+      
+      {/* Mobile Hamburger Header */}
+      <div className="d-flex d-md-none align-items-center mb-3">
+        <Button variant="outline-primary" className="me-2" onClick={handleSidebarOpen}>
+          <FaBars size={20} />
+        </Button>
+        <h5 className="mb-0 fw-bold">Faculty Payments</h5>
+      </div>
+
       <Row>
-        {/* Sidebar */}
+        {/* Sidebar: Offcanvas for mobile */}
+        <Offcanvas show={showSidebar} onHide={handleSidebarClose} className="d-md-none" backdrop>
+          <Offcanvas.Header closeButton>
+            <Offcanvas.Title>Menu</Offcanvas.Title>
+          </Offcanvas.Header>
+          <Offcanvas.Body>
+            {<AdminSidebar />}
+            <div className="text-muted small mt-4">Role: Payment Officer</div>
+          </Offcanvas.Body>
+        </Offcanvas>
+
+        {/* Sidebar: static for desktop */}
         <Col md={3} className="d-none d-md-block">
           <Card
             className="shadow-sm border-0 rounded-4 p-3 sticky-top"
             style={{ minHeight: "90vh" }}
           >
-            <div className="text-center mb-4">
-              <img
-                src="rcoe logo.jpg"
-                alt="RCOE Logo"
-                style={{ width: 60, borderRadius: "50%" }}
-                className="mb-2"
-              />
-              <h5 className="fw-bold mb-0">Rizvi College of Engineering</h5>
-              <small className="text-muted">Admin Panel</small>
-            </div>
-
-            <ul className="list-group list-group-flush">
-              <li className="list-group-item active d-flex align-items-center gap-2 border-0 rounded-3 mb-1">
-                <FaMoneyCheckAlt /> Payments
-              </li>
-              <li className="list-group-item d-flex align-items-center gap-2 border-0 mb-1">
-                <FaSyncAlt /> Manage Payments
-              </li>
-              <li className="list-group-item d-flex align-items-center gap-2 border-0 mb-1">
-                <FaCheckCircle /> Payment Status
-              </li>
-              <li className="list-group-item d-flex align-items-center gap-2 border-0 mb-1">
-                <FaHistory /> Payment History
-              </li>
-              <li className="list-group-item d-flex align-items-center gap-2 border-0 mb-1">
-                <FaUsers /> Faculty Management
-              </li>
-            </ul>
+            {<AdminSidebar />}
+            <div className="text-muted small mt-4">Role: Payment Officer</div>
           </Card>
         </Col>
 
         {/* Main Content */}
         <Col md={9}>
-          <h2 className="mb-2 fw-bold">Faculty Payments</h2>
-          <hr className="mb-4" />
+          <div className="d-none d-md-block">
+            <h2 className="mb-2 fw-bold">Faculty Payments</h2>
+            <hr className="mb-4" />
+          </div>
+          <div className="d-md-none mb-3" />
 
           {/* Initiate Payments */}
           <Card className="mb-4 p-4 shadow rounded-4 border-0 bg-white">
@@ -53,14 +56,18 @@ function AdminPaymentsPage() {
             <small className="text-muted mb-3 d-block">
               Start a new payment process for faculty members.
             </small>
+
             <Row className="mb-3">
               <Col md={6} className="mb-3 mb-md-0">
                 <Form.Group>
                   <Form.Label>Select Faculty</Form.Label>
                   <Form.Select>
                     <option>Choose...</option>
-                    <option>Dr. A. Smith</option>
-                    <option>Prof. B. Johnson</option>
+                    <option>Prof. Mohd Ashfaque</option>
+                    <option>Prof. Reshma Lohar</option>
+                    <option>Prof. Anupam Choudhary</option>
+                    <option>Prof. Manila Gupta</option>
+                    <option>Prof. Dinesh Chouhan</option>
                   </Form.Select>
                 </Form.Group>
               </Col>
@@ -69,8 +76,8 @@ function AdminPaymentsPage() {
                   <Form.Label>Select Semester</Form.Label>
                   <Form.Select>
                     <option>Choose...</option>
-                    <option>Odd Sem 2023</option>
-                    <option>Even Sem 2023</option>
+                    <option>Sem 1 2023</option>
+                    <option>Sem 3 2023</option>
                   </Form.Select>
                 </Form.Group>
               </Col>
@@ -105,7 +112,7 @@ function AdminPaymentsPage() {
             <div className="border-top pt-3 mt-4 mb-2">
               <h5 className="fw-bold mb-1">Remuneration Calculation</h5>
               <small className="text-muted mb-3 d-block">
-                Calculate remuneration for each subject and paper type.
+                Calculate remuneration for each subject.
               </small>
             </div>
             <Row className="mb-3">
@@ -114,8 +121,8 @@ function AdminPaymentsPage() {
                   <Form.Label>Select Subject</Form.Label>
                   <Form.Select>
                     <option>Choose...</option>
-                    <option>Calculus</option>
-                    <option>Linear Algebra</option>
+                    <option>Machine Learning</option>
+                    <option>Big Data Analytics</option>
                   </Form.Select>
                 </Form.Group>
               </Col>
@@ -178,6 +185,7 @@ function AdminPaymentsPage() {
               </Col>
             </Row>
 
+            {/* Save Payment Button */}
             <div className="d-flex justify-content-end">
               <Button
                 variant="success"
@@ -186,6 +194,7 @@ function AdminPaymentsPage() {
                 <FaSave /> Save Payment
               </Button>
             </div>
+
           </Card>
 
           {/* Calculated Remunerations */}
@@ -335,8 +344,9 @@ function AdminPaymentsPage() {
           {new Date().getFullYear()} Rizvi College of Engineering
         </div>
       </footer>
+      
     </Container>
   );
 }
 
-export default AdminPaymentsPage;
+export default Payments;
