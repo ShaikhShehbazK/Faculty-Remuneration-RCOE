@@ -3,20 +3,46 @@ const subjectRouter = express.Router();
 const subjectController = require("../controllers/subjectController");
 const Subject = require("../models/subjects");
 const isAdmin = require("../controllers/isAdmin");
+const { jwtAuthMiddleware } = require("../jwt");
 
 // ✅ GET all subjects (optionally filtered by semester or department)
-subjectRouter.get("/getList", isAdmin, subjectController.getSubjects);
+subjectRouter.get(
+  "/getList",
+  jwtAuthMiddleware,
+  isAdmin,
+  subjectController.getSubjects
+);
 
 // ✅ POST create new subject
-subjectRouter.post("/create", isAdmin, subjectController.postCreate);
+subjectRouter.post(
+  "/create",
+  jwtAuthMiddleware,
+  isAdmin,
+  subjectController.postCreate
+);
 
 // ✅ PUT update subject
-subjectRouter.put("/update/:id", isAdmin, subjectController.putUpdate);
+subjectRouter.put(
+  "/update/:id",
+  jwtAuthMiddleware,
+  isAdmin,
+  subjectController.putUpdate
+);
 
 // ✅ DELETE subject
-subjectRouter.delete("/delete/:id", isAdmin, subjectController.delete);
+subjectRouter.delete(
+  "/delete/:id",
+  jwtAuthMiddleware,
+  isAdmin,
+  subjectController.delete
+);
 
 // POST /api/admin/subjects/bulk — Create multiple subjects
-subjectRouter.post("/bulk", isAdmin, subjectController.createBulk);
+subjectRouter.post(
+  "/bulk",
+  jwtAuthMiddleware,
+  isAdmin,
+  subjectController.createBulk
+);
 
 module.exports = subjectRouter;

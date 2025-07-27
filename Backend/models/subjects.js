@@ -4,7 +4,7 @@ const mongoose = require("mongoose");
 const subjectSchema = new mongoose.Schema({
   name: { type: String, required: true },
   semester: { type: Number, required: true },
-  department: { type: String },
+  department: { type: String, required: true },
 
   // Assessment flags
   hasPractical: { type: Boolean, default: false },
