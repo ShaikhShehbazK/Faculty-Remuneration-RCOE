@@ -5,7 +5,7 @@ const Subject = require("../models/subjects");
 const isAdmin = require("../controllers/isAdmin");
 
 // ✅ GET all subjects (optionally filtered by semester or department)
-subjectRouter.get("/getList", isAdmin, subjectController.getSubjects);
+subjectRouter.get("/getList", subjectController.getSubjects);
 
 // ✅ POST create new subject
 subjectRouter.post("/create", isAdmin, subjectController.postCreate);

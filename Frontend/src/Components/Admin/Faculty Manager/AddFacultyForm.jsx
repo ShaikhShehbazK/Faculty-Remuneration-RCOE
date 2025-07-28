@@ -1,7 +1,10 @@
-import React, { useState } from 'react';
+import React, { useState , useEffect } from 'react';
 import { Container, Form, Row, Col, Button, Alert, Card } from 'react-bootstrap';
 import { FaArrowLeft, FaUserPlus, FaUserTie, FaBookOpen, FaEnvelope, FaPhone } from 'react-icons/fa';
 import { useNavigate } from 'react-router-dom';
+import axios from 'axios';
+import Select from 'react-select';
+
 
 function AddFacultyForm() {
   const navigate = useNavigate();
@@ -10,8 +13,9 @@ function AddFacultyForm() {
     department: '',
     designation: '',
     email: '',
+    password: '',
     phone: '',
-    baseSalary: '', // new field
+    baseSalary: '', 
     travelAllowance: '',
     semester: '',
     subject: '',
@@ -21,10 +25,33 @@ function AddFacultyForm() {
 
   const [success, setSuccess] = useState(false);
 
+  const [subjectOptions, setSubjectOptions] = useState([]);
+
   const departments = ['Computer', 'Mechanical', 'Electrical', 'Civil', 'AIDS', 'ECS'];
   const designations = ['Professor', 'Associate Professor', 'Assistant Professor', 'HoD'];
-  const semesters = ['Semester 1', 'Semester 2', 'Semester 3', 'Semester 4'];
-  const subjects = ['Data Structures', 'Operating Systems', 'Algorithms', 'Calculus'];
+  const semesters = [1, 2, 3, 4, 5, 6, 7, 8];
+  /* const subjects = ['Data Structures', 'Operating Systems', 'Algorithms', 'Calculus']; */
+
+  useEffect(() => {
+  const fetchSubjects = async () => {
+    console.log("Fetching subjects for semester:", formData.semester);
+    if (formData.semester && formData.semester !== 'Select') {
+      try {
+        const res = await axios.get(`http://localhost:3002/subject/getList?semester=${formData.semester}`);
+        console.log(res.data);
+        const subjectNames = res.data.map((subj) => subj.name); // assuming Subject has a 'name'
+        setSubjectOptions(subjectNames);
+      } catch (err) {
+        console.error('Failed to fetch subjects:', err);
+      }
+    } else {
+      setSubjectOptions([]); // clear when no semester selected
+    }
+  };
+
+  fetchSubjects();
+}, [formData.semester]);
+
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -41,7 +68,7 @@ function AddFacultyForm() {
       if (!exists) {
         setAssignedSubjects(prev => [...prev, { semester: formData.semester, subject: formData.subject }]);
       }
-      // Clear subject selection after adding
+      // Clear subject selection field after adding
       setFormData(prev => ({ ...prev, subject: '', semester: '' }));
     }
   };
@@ -93,18 +120,23 @@ function AddFacultyForm() {
               </Form.Group>
               <Form.Group className="mb-3">
                 <Form.Label>Department</Form.Label>
-                <Form.Select name="department" value={formData.department} onChange={handleChange}>
-                  <option>Select</option>
-                  {departments.map((dep, idx) => <option key={idx} value={dep}>{dep}</option>)}
-                </Form.Select>
+                <Select
+                  options={departments.map(dep => ({ value: dep, label: dep }))}
+                  value={formData.department ? { value: formData.department, label: formData.department } : null}
+                  onChange={selected => setFormData(prev => ({ ...prev, department: selected ? selected.value : '' }))}
+                  placeholder="Select Department"
+                />
               </Form.Group>
               <Form.Group className="mb-3">
                 <Form.Label>Designation</Form.Label>
-                <Form.Select name="designation" value={formData.designation} onChange={handleChange}>
-                  <option>Select</option>
-                  {designations.map((designation, idx) => <option key={idx} value={designation}>{designation}</option>)}
-                </Form.Select>
+                <Select
+                  options={designations.map(des => ({ value: des, label: des }))}
+                  value={formData.designation ? { value: formData.designation, label: formData.designation } : null}
+                  onChange={selected => setFormData(prev => ({ ...prev, designation: selected ? selected.value : '' }))}
+                  placeholder="Select Designation"
+                />
               </Form.Group>
+
               {/* Remuneration Details Section */}
               <div className="d-flex align-items-center gap-2 mb-3 mt-4">
                 <FaUserPlus className="text-success" />
@@ -131,6 +163,10 @@ function AddFacultyForm() {
                 <Form.Control name="email" value={formData.email} onChange={handleChange} placeholder="Enter email address" />
               </Form.Group>
               <Form.Group className="mb-3">
+                <Form.Label>Password</Form.Label>
+                <Form.Control name="password" value={formData.password} onChange={handleChange} placeholder="Enter password" />
+              </Form.Group>
+              <Form.Group className="mb-3">
                 <Form.Label>Phone Number</Form.Label>
                 <Form.Control name="phone" value={formData.phone} onChange={handleChange} placeholder="Enter phone number" />
               </Form.Group>
@@ -145,19 +181,23 @@ function AddFacultyForm() {
                   <Col xs={6}>
                     <Form.Group className="mb-3">
                       <Form.Label>Semester</Form.Label>
-                      <Form.Select name="semester" value={formData.semester} onChange={handleChange}>
-                        <option>Select</option>
-                        {semesters.map((sem, idx) => <option key={idx} value={sem}>{sem}</option>)}
-                      </Form.Select>
+                      <Select
+                        options={semesters.map(sem => ({ value: sem, label: `Semester ${sem}` }))}
+                        value={formData.semester ? { value: formData.semester, label: `Semester ${formData.semester}` } : null}
+                        onChange={selected => setFormData(prev => ({ ...prev, semester: selected ? selected.value : '' }))}
+                        placeholder="Select Semester"
+                      />
                     </Form.Group>
                   </Col>
                   <Col xs={6}>
                     <Form.Group className="mb-3">
                       <Form.Label>Subjects</Form.Label>
-                      <Form.Select name="subject" value={formData.subject} onChange={handleChange}>
-                        <option>Select</option>
-                        {subjects.map((sub, idx) => <option key={idx} value={sub}>{sub}</option>)}
-                      </Form.Select>
+                      <Select
+                        options={subjectOptions.map(sub => ({ value: sub, label: sub }))}
+                        value={formData.subject ? { value: formData.subject, label: formData.subject } : null}
+                        onChange={selected => setFormData(prev => ({ ...prev, subject: selected ? selected.value : '' }))}
+                        placeholder="Select Subject"
+                      />
                     </Form.Group>
                   </Col>
                 </Row>
@@ -166,6 +206,7 @@ function AddFacultyForm() {
                     Add Assignment
                   </Button>
                 </div>
+
                 {/* Assigned Subjects List */}
                 {assignedSubjects.length > 0 && (
                   <div className="mb-2">

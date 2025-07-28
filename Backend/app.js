@@ -22,10 +22,16 @@ const app = express();
 //     credentials: true, // ✅ required for cookies
 //   })
 // );
+app.use(cors({
+  origin: 'http://localhost:5173',
+  credentials: true // if using cookies / sessions
+}));
 
 app.use(express.json());
 app.use(express.urlencoded());
 app.use(bodyParser.urlencoded({ extended: true }));
+
+
 
 const MONGO_DB_URL = process.env.MONGO_URI;
 

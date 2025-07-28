@@ -6,8 +6,7 @@ const isAdmin = require("../controllers/isAdmin");
 // ✅ Add New Faculty
 facultyManagement.post(
   "/add",
-  jwtAuthMiddleware,
-  isAdmin,
+  
   facultyManagementC.addFaculty
 );
 

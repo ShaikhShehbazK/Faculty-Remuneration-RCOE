@@ -1,6 +1,17 @@
+
 const Subject = require("../models/subjects");
 
 exports.getSubjects = async (req, res) => {
+  try {
+    const semester = Number(req.query.semester);
+    const subjects = await Subject.find({ semester });
+    res.json(subjects);
+  } catch (error) {
+    res.status(500).json({ error: 'Failed to fetch subjects' });
+  }
+};  
+
+/* exports.getSubjects = async (req, res) => {
   try {
     const filters = {};
 
@@ -17,7 +28,8 @@ exports.getSubjects = async (req, res) => {
   } catch (err) {
     res.status(500).json({ error: "Failed to fetch subjects" });
   }
-};
+}; 
+ */
 
 exports.postCreate = async (req, res) => {
   try {
