@@ -37,7 +37,7 @@ const MONGO_DB_URL = process.env.MONGO_URI;
 
 app.use("/faculty", facultyAuthRoute);
 app.use("/admin", adminAuthRoute);
-app.use("/subject", subjectRouter);
+app.use("/faculty/subject", subjectRouter);
 app.use("/admin/faculty", facultyManagement);
 // app.use(userRouter);
 // app.use("/candidate", candidateRouter);
