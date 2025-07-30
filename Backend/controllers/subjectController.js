@@ -11,7 +11,8 @@ exports.getSubjects = async (req, res) => {
   }
 };  
 
-/* exports.getSubjects = async (req, res) => {
+/* 
+exports.getSubjects = async (req, res) => {
   try {
     const filters = {};
 
@@ -29,7 +30,7 @@ exports.getSubjects = async (req, res) => {
     res.status(500).json({ error: "Failed to fetch subjects" });
   }
 }; 
- */
+*/
 
 exports.postCreate = async (req, res) => {
   try {

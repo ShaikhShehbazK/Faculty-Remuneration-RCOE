@@ -1,4 +1,6 @@
 import React, { useState } from "react";
+import axios from "axios";
+import { useNavigate } from 'react-router-dom';
 
 function Login() {
   const [loginRole, setLoginRole] = useState("faculty"); // faculty or admin
@@ -8,6 +10,8 @@ function Login() {
     adminId: "",
   });
 
+  const navigate = useNavigate();
+
   const handleInputChange = (e) => {
     setFormData((prev) => ({
       ...prev,
@@ -15,17 +19,67 @@ function Login() {
     }));
   };
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    const payload = {
-      role: loginRole,
-      ...(loginRole === "faculty"
-        ? { username: formData.username, password: formData.password }
-        : { adminId: formData.adminId, password: formData.password }),
-    };
-    console.log("Submitting:", payload);
-    // Send `payload` to backend
+/*
+const handleSubmit = (e) => {
+  e.preventDefault();
+  const payload = {
+     role: loginRole, 
+    ...(loginRole === "faculty"
+      ? { username: formData.username, password: formData.password }
+      : { adminId: formData.adminId, password: formData.password }),
   };
+  console.log("Submitting:", payload); 
+  // Send `payload` to backend
+}; 
+*/
+
+const handleSubmit = async (e) => {
+  e.preventDefault();
+
+  const payload =
+    loginRole === "faculty"
+      ? {
+          username: formData.username,
+          password: formData.password,
+        }
+      : {
+          email: formData.adminId, // Temporarily using adminId field as email.
+          password: formData.password,
+        };
+
+  try {
+    if (loginRole === "admin") {
+      const response = await axios.post("http://localhost:3002/admin/login", payload);
+
+      if (response.data.token) {
+        alert("Admin Login Successful ✅");
+
+        // Save token
+        localStorage.setItem("token", response.data.token);
+
+        // Clear form
+        setFormData({
+          username: "",
+          password: "",
+          adminId: "",
+        });
+
+        // Navigate to /admin/payments
+        navigate("/admin/payments");
+      } else {
+        alert("Unexpected response from server");
+      }
+    } else {
+      alert("Faculty login not implemented yet");
+    }
+  } catch (err) {
+    console.error("Login failed:", err);
+    alert(
+      err?.response?.data?.message || "Login failed. Check console for details."
+    );
+  }
+};
+
 
   return (
     <>
@@ -113,7 +167,7 @@ function Login() {
                 <div className="mb-3">
                   <label className="form-label">Admin ID</label>
                   <input
-                    type="text"
+                    type="email"
                     name="adminId"
                     className="form-control bg-light border-0 shadow-sm"
                     value={formData.adminId}

@@ -25,8 +25,12 @@ exports.addFaculty = async (req, res) => {
       name: req.body.name,
       email: req.body.email,
       password: hashedPassword,
+      phone: req.body.phone,
       department: req.body.department,
+      role: req.body.role || "faculty",
       baseSalary: req.body.baseSalary,
+      travelAllowance: req.body.travelAllowance,
+      designation: req.body.designation,
       assignedSubjects,
     });
     await faculty.save();

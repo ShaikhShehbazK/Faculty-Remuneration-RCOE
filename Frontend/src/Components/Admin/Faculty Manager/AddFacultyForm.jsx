@@ -24,6 +24,8 @@ function AddFacultyForm() {
   const [assignedSubjects, setAssignedSubjects] = useState([]); // [{ semester, subject }]
 
   const [success, setSuccess] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState('');
 
   const [subjectOptions, setSubjectOptions] = useState([]);
 
@@ -37,7 +39,7 @@ function AddFacultyForm() {
     console.log("Fetching subjects for semester:", formData.semester);
     if (formData.semester && formData.semester !== 'Select') {
       try {
-        const res = await axios.get(`http://localhost:3002/subject/getList?semester=${formData.semester}`);
+        const res = await axios.get(`http://localhost:3002/faculty/subject/getList?semester=${formData.semester}`);
         console.log(res.data);
         const subjectNames = res.data.map((subj) => subj.name); // assuming Subject has a 'name'
         setSubjectOptions(subjectNames);
@@ -77,16 +79,55 @@ function AddFacultyForm() {
     setAssignedSubjects(prev => prev.filter((_, i) => i !== index));
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    // 👉 Replace with API call
-    const facultyData = {
-      ...formData,
-      assignedSubjects,
-    };
-    console.log('Faculty data submitted:', facultyData);
-    setSuccess(true);
-    setTimeout(() => setSuccess(false), 5000);
+    setLoading(true);
+    setError('');
+    
+    try {
+      // Format the data according to backend expectations
+      const facultyData = {
+        name: formData.name,
+        email: formData.email,
+        password: formData.password,
+        phone: formData.phone,
+        department: formData.department,
+        designation: formData.designation,
+        baseSalary: Number(formData.baseSalary),
+        travelAllowance: Number(formData.travelAllowance),
+        subjects: assignedSubjects.map(subject => ({
+          name: subject.subject,
+          semester: Number(subject.semester)
+        }))
+      };
+
+      const response = await axios.post('http://localhost:3002/admin/faculty/add', facultyData);
+      
+      console.log('Faculty created successfully:', response.data);
+      setSuccess(true);
+      
+      // Reset form after successful submission
+      setFormData({
+        name: '',
+        department: '',
+        designation: '',
+        email: '',
+        password: '',
+        phone: '',
+        baseSalary: '', 
+        travelAllowance: '',
+        semester: '',
+        subject: '',
+      });
+      setAssignedSubjects([]);
+      
+      setTimeout(() => setSuccess(false), 5000);
+    } catch (err) {
+      console.error('Error creating faculty:', err);
+      setError(err.response?.data?.error || 'Failed to create faculty. Please try again.');
+    } finally {
+      setLoading(false);
+    }
   };
 
   const handleGoBack = () => {
@@ -228,10 +269,32 @@ function AddFacultyForm() {
           </Row>
 
           <div className="text-end mt-3">
-            <Button type="submit" variant="primary" className="fw-bold px-4 py-2 d-flex align-items-center gap-2 rounded-pill">
-              <FaUserPlus /> Add Faculty
+            <Button 
+              type="submit" 
+              variant="primary" 
+              className="fw-bold px-4 py-2 d-flex align-items-center gap-2 rounded-pill"
+              disabled={loading}
+            >
+              {loading ? (
+                <>
+                  <div className="spinner-border spinner-border-sm" role="status">
+                    <span className="visually-hidden">Loading...</span>
+                  </div>
+                  Creating...
+                </>
+              ) : (
+                <>
+                  <FaUserPlus /> Add Faculty
+                </>
+              )}
             </Button>
           </div>
+
+          {error && (
+            <Alert variant="danger" className="mt-4 rounded-3 shadow-sm">
+              <strong>Error:</strong> {error}
+            </Alert>
+          )}
 
           {success && (
             <Alert variant="success" className="mt-4 rounded-3 shadow-sm">
