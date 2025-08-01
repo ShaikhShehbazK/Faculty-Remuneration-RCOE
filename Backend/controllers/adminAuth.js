@@ -42,7 +42,7 @@ exports.postLogin = async (req, res, next) => {
     if (!admin) {
       return res
         .status(404)
-        .json({ message: "Faculty is not found or incorrect email" });
+        .json({ message: "Admin not found or incorrect email" });
     }
 
     const isMatch = await bcrypt.compare(password, admin.password);
@@ -50,6 +50,7 @@ exports.postLogin = async (req, res, next) => {
     if (!isMatch) {
       return res.status(404).json({ message: "Incorrect Password" });
     }
+
     const payload = {
       id: admin._id,
       email: admin.email,
@@ -57,7 +58,8 @@ exports.postLogin = async (req, res, next) => {
     };
     const token = generateToken(payload);
     res.json({ message: "login successfully", token });
-  } catch (err) {
+  } 
+  catch (err) {
     console.log("Error while logging in : ", err);
     res.status(500).json({ error: "Internal server error" });
   }

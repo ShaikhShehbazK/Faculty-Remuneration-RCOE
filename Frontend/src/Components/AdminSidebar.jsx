@@ -4,6 +4,7 @@ import {
   FaCheckCircle,
   FaHistory,
   FaUsers,
+  FaSignOutAlt,
 } from "react-icons/fa";
 import { NavLink } from "react-router-dom";
 
@@ -64,6 +65,16 @@ function AdminSidebar() {
             </NavLink>
           </li>
         ))}
+
+        <li className="list-group-item border-0 mb-1 p-0 mt-4">
+          <a
+            href="/logout"
+            className="d-flex align-items-center gap-2 px-3 py-2 text-decoration-none rounded text-danger"
+          >
+            <FaSignOutAlt /> Logout
+          </a>
+        </li>
+
       </ul>
     </>
   );
