@@ -13,6 +13,8 @@ const facultyAuthRoute = require("./routes/facultyAuthRoute");
 const adminAuthRoute = require("./routes/adminAuthRoute");
 const subjectRouter = require("./routes/subjectRoute");
 const facultyManagement = require("./routes/facultyManagement");
+const paymentRouter = require("./routes/paymentRoute");
+const generatePDF = require("./routes/genereate-pdf");
 
 const app = express();
 
@@ -22,16 +24,16 @@ const app = express();
 //     credentials: true, // ✅ required for cookies
 //   })
 // );
-app.use(cors({
-  origin: 'http://localhost:5173',
-  credentials: true // if using cookies / sessions
-}));
+app.use(
+  cors({
+    origin: "http://localhost:5173",
+    credentials: true, // if using cookies / sessions
+  })
+);
 
 app.use(express.json());
 app.use(express.urlencoded());
 app.use(bodyParser.urlencoded({ extended: true }));
-
-
 
 const MONGO_DB_URL = process.env.MONGO_URI;
 
@@ -39,8 +41,8 @@ app.use("/faculty", facultyAuthRoute);
 app.use("/admin", adminAuthRoute);
 app.use("/faculty/subject", subjectRouter);
 app.use("/admin/faculty", facultyManagement);
-// app.use(userRouter);
-// app.use("/candidate", candidateRouter);
+app.use("/admin/payment", paymentRouter);
+app.use("/payment", generatePDF);
 
 const Port = process.env.port || 3003;
 mongoose
