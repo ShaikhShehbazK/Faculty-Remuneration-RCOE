@@ -1,12 +1,14 @@
 import React, { useState , useEffect } from 'react';
 import { Container, Form, Row, Col, Button, Alert, Card } from 'react-bootstrap';
 import { FaArrowLeft, FaUserPlus, FaUserTie, FaBookOpen, FaEnvelope, FaPhone } from 'react-icons/fa';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import api from '../../../utils/api';
 import Select from 'react-select';
 
-function AddFacultyForm() {
+function EditFaculty() {
   const navigate = useNavigate();
+  const { id } = useParams(); // Get faculty ID from URL parameters
+  
   const [formData, setFormData] = useState({
     name: '',
     department: '',
@@ -24,6 +26,7 @@ function AddFacultyForm() {
 
   const [success, setSuccess] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [fetching, setFetching] = useState(true);
   const [error, setError] = useState('');
 
   const [subjectOptions, setSubjectOptions] = useState([]);
@@ -31,7 +34,61 @@ function AddFacultyForm() {
   const departments = ['Computer', 'Mechanical', 'Electrical', 'Civil', 'AIDS', 'ECS'];
   const designations = ['Professor', 'Associate Professor', 'Assistant Professor', 'HoD', 'External Examiner'];
   const semesters = [1, 2, 3, 4, 5, 6, 7, 8];
-  /* const subjects = ['Data Structures', 'Operating Systems', 'Algorithms', 'Calculus']; */
+
+  // Fetch faculty data when component mounts
+  useEffect(() => {
+    const fetchFacultyData = async () => {
+      if (!id) {
+        setError('Faculty ID not found');
+        setFetching(false);
+        return;
+      }
+
+      try {
+        setFetching(true);
+        const response = await api.get(`/admin/faculty/getSingle/${id}`);
+        const faculty = response.data;
+        
+        console.log('Fetched faculty data:', faculty);
+        
+        // Populate form with existing faculty data
+        setFormData({
+          name: faculty.name || '',
+          department: faculty.department || '',
+          designation: faculty.designation || '',
+          email: faculty.email || '',
+          password: '', // Don't populate password for security
+          phone: faculty.phone || '',
+          baseSalary: faculty.baseSalary || '',
+          travelAllowance: faculty.travelAllowance || '',
+          semester: '',
+          subject: '',
+        });
+
+        // Populate assigned subjects
+        if (faculty.assignedSubjects && faculty.assignedSubjects.length > 0) {
+          const subjects = faculty.assignedSubjects.map(subject => ({
+            semester: subject.semester,
+            subject: subject.name
+          }));
+          setAssignedSubjects(subjects);
+        }
+
+        setError('');
+      } catch (err) {
+        console.error('Failed to fetch faculty data:', err);
+        setError('Failed to load faculty data. Please try again.');
+        if (err.response?.status === 401) {
+          alert('Authentication failed. Please login again.');
+          navigate('/login');
+        }
+      } finally {
+        setFetching(false);
+      }
+    };
+
+    fetchFacultyData();
+  }, [id, navigate]);
 
   useEffect(() => {
   const fetchSubjects = async () => {
@@ -56,7 +113,6 @@ function AddFacultyForm() {
 
   fetchSubjects();
 }, [formData.semester, navigate]);
-
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -92,7 +148,6 @@ function AddFacultyForm() {
       const facultyData = {
         name: formData.name,
         email: formData.email,
-        password: formData.password,
         phone: formData.phone,
         department: formData.department,
         designation: formData.designation,
@@ -104,34 +159,27 @@ function AddFacultyForm() {
         }))
       };
 
-      const response = await api.post('/admin/faculty/add', facultyData);
+      // Only include password if it's been changed
+      if (formData.password) {
+        facultyData.password = formData.password;
+      }
+
+      const response = await api.put(`/admin/faculty/edit/${id}`, facultyData);
       
-      console.log('Faculty created successfully:', response.data);
+      console.log('Faculty updated successfully:', response.data);
       setSuccess(true);
       
-      // Reset form after successful submission
-      setFormData({
-        name: '',
-        department: '',
-        designation: '',
-        email: '',
-        password: '',
-        phone: '',
-        baseSalary: '', 
-        travelAllowance: '',
-        semester: '',
-        subject: '',
-      });
-      setAssignedSubjects([]);
-      
-      setTimeout(() => setSuccess(false), 5000);
+      setTimeout(() => {
+        setSuccess(false);
+        navigate('/admin/facultymanager');
+      }, 2000);
     } catch (err) {
-      console.error('Error creating faculty:', err);
+      console.error('Error updating faculty:', err);
       if (err.response?.status === 401) {
         alert('Authentication failed. Please login again.');
         navigate('/login');
       } else {
-        setError(err.response?.data?.error || 'Failed to create faculty. Please try again.');
+        setError(err.response?.data?.error || 'Failed to update faculty. Please try again.');
       }
     } finally {
       setLoading(false);
@@ -142,6 +190,21 @@ function AddFacultyForm() {
     navigate('/admin/facultymanager');
   };
 
+  if (fetching) {
+    return (
+      <Container fluid className="p-4 bg-light min-vh-100">
+        <div className="d-flex justify-content-center align-items-center" style={{ minHeight: '60vh' }}>
+          <div className="text-center">
+            <div className="spinner-border text-primary" role="status">
+              <span className="visually-hidden">Loading...</span>
+            </div>
+            <p className="mt-3 text-muted">Loading faculty data...</p>
+          </div>
+        </div>
+      </Container>
+    );
+  }
+
   return (
     <Container fluid className="p-4 bg-light min-vh-100">
 
@@ -150,8 +213,15 @@ function AddFacultyForm() {
         <Button variant="outline-secondary" className="d-flex align-items-center gap-2" onClick={handleGoBack}>
           <FaArrowLeft /> Back
         </Button>
-        <h2 className="fw-bold mb-0">Add Faculty Member</h2>
+        <h2 className="fw-bold mb-0">Edit Faculty Member</h2>
       </div>
+
+      {/* Error Alert */}
+      {error && (
+        <Alert variant="danger" className="mb-4">
+          {error}
+        </Alert>
+      )}
 
       {/* Card that contains Form */}
       <Card className="shadow rounded-4 border-0 p-4 bg-white mx-auto" style={{ maxWidth: 900 }}>
@@ -214,8 +284,8 @@ function AddFacultyForm() {
                 <Form.Control name="email" value={formData.email} onChange={handleChange} placeholder="Enter email address" required/>
               </Form.Group>
               <Form.Group className="mb-3">
-                <Form.Label>Password</Form.Label>
-                <Form.Control name="password" value={formData.password} onChange={handleChange} placeholder="Enter password" required/>
+                <Form.Label>Password (Leave blank to keep current password)</Form.Label>
+                <Form.Control name="password" value={formData.password} onChange={handleChange} placeholder="Enter new password (optional)" type="password"/>
               </Form.Group>
               <Form.Group className="mb-3">
                 <Form.Label>Phone Number</Form.Label>
@@ -237,7 +307,6 @@ function AddFacultyForm() {
                         value={formData.semester ? { value: formData.semester, label: `Semester ${formData.semester}` } : null}
                         onChange={selected => setFormData(prev => ({ ...prev, semester: selected ? selected.value : '' }))}
                         placeholder="Select Semester"
-                        required
                       />
                     </Form.Group>
                   </Col>
@@ -249,7 +318,6 @@ function AddFacultyForm() {
                         value={formData.subject ? { value: formData.subject, label: formData.subject } : null}
                         onChange={selected => setFormData(prev => ({ ...prev, subject: selected ? selected.value : '' }))}
                         placeholder="Select Subject"
-                        required
                       />
                     </Form.Group>
                   </Col>
@@ -292,11 +360,11 @@ function AddFacultyForm() {
                   <div className="spinner-border spinner-border-sm" role="status">
                     <span className="visually-hidden">Loading...</span>
                   </div>
-                  Creating...
+                  Updating...
                 </>
               ) : (
                 <>
-                  <FaUserPlus /> Add Faculty
+                  <FaUserPlus /> Update Faculty
                 </>
               )}
             </Button>
@@ -310,7 +378,7 @@ function AddFacultyForm() {
 
           {success && (
             <Alert variant="success" className="mt-4 rounded-3 shadow-sm">
-              Faculty member <strong>{formData.name}</strong> added successfully. <a href="#" className="fw-bold text-primary text-decoration-underline">View Profile</a>
+              Faculty member <strong>{formData.name}</strong> updated successfully. Redirecting to faculty list...
             </Alert>
           )}
           
@@ -319,6 +387,6 @@ function AddFacultyForm() {
 
     </Container>
   );
-};
+}
 
-export default AddFacultyForm;
+export default EditFaculty;

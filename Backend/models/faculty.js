@@ -18,6 +18,7 @@ const facultySchema = new mongoose.Schema(
         "Associate Professor",
         "Professor",
         "External Examiner",
+        "HoD",
       ],
       required: true,
     },

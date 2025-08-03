@@ -58,7 +58,7 @@ exports.postLogin = async (req, res, next) => {
     };
     const token = generateToken(payload);
     res.json({ message: "login successfully", token });
-  } 
+  }
   catch (err) {
     console.log("Error while logging in : ", err);
     res.status(500).json({ error: "Internal server error" });

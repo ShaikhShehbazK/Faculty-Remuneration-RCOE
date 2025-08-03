@@ -67,9 +67,39 @@ exports.getSingleFaculty = async (req, res) => {
 
 exports.editFaculty = async (req, res) => {
   try {
-    const faculty = await Faculty.findByIdAndUpdate(req.params.id, req.body, {
+    const updateData = { ...req.body };
+
+    // If password is provided, hash it before updating
+    if (updateData.password) {
+      updateData.password = await bcrypt.hash(updateData.password, 12);
+    }
+
+    // Handle subjects if provided
+    if (updateData.subjects) {
+      const assignedSubjects = await Promise.all(
+        updateData.subjects.map(async (subj) => {
+          const subjectDoc = await Subject.findOne({
+            name: subj.name,
+            semester: subj.semester,
+          });
+          return {
+            subjectId: subjectDoc._id,
+            name: subj.name,
+            semester: subj.semester,
+          };
+        })
+      );
+      updateData.assignedSubjects = assignedSubjects;
+    }
+
+    const faculty = await Faculty.findByIdAndUpdate(req.params.id, updateData, {
       new: true,
-    });
+    }).populate("assignedSubjects.subjectId");
+
+    if (!faculty) {
+      return res.status(404).json({ error: "Faculty not found" });
+    }
+
     res.json(faculty);
   } catch (err) {
     res.status(400).json({ error: "Update failed", details: err.message });
