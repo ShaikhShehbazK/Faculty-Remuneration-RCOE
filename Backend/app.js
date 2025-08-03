@@ -15,6 +15,8 @@ const subjectRouter = require("./routes/subjectRoute");
 const facultyManagement = require("./routes/facultyManagement");
 const paymentRouter = require("./routes/paymentRoute");
 const generatePDF = require("./routes/genereate-pdf");
+const forgetPasswordRouter = require("./routes/forgetPasswordRoute");
+const changePasswordRouter = require("./routes/changePasswordRoute");
 
 const app = express();
 
@@ -43,6 +45,8 @@ app.use("/faculty/subject", subjectRouter);
 app.use("/admin/faculty", facultyManagement);
 app.use("/admin/payment", paymentRouter);
 app.use("/payment", generatePDF);
+app.use("/", forgetPasswordRouter);
+app.use("/", changePasswordRouter);
 
 const Port = process.env.port || 3003;
 mongoose

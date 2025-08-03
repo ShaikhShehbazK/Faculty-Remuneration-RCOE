@@ -19,6 +19,9 @@ import FacultyPayments from "./Components/Faculty/FacultyPayments";
 import SubjectRemuneration from "./Components/Faculty/SubjectRemuneration";
 import OverallSlip from "./Components/Faculty/OverallSlip";
 import EditFaculty from "./Components/Admin/Faculty Manager/EditFaculty";
+import ResetPassword from "./Components/ForgotPassword/ResetPassword";
+import ForgotPassword from "./Components/ForgotPassword/ForgotPassword";
+import ProtectedRoute from "./Components/ProtectedRoute";
 
 function App() {
   return (
@@ -26,35 +29,41 @@ function App() {
       <Routes>
         <Route path="/" element={<Login />}></Route>
 
-        {/* Admin Routes */}
-        <Route path="/admin/payments" element={<Payments />}></Route>
+        <Route element={<ProtectedRoute />}>
+          {/* Admin Routes */}
+          <Route path="/admin/payments" element={<Payments />}></Route>
         
-        <Route path="/admin/managepayments" element={<ManagePayments />}></Route>
+          <Route path="/admin/managepayments" element={<ManagePayments />}></Route>
 
-        <Route path="/admin/paymentstatus" element={<PaymentStatus />}></Route>
+          <Route path="/admin/paymentstatus" element={<PaymentStatus />} ></Route>
 
-        <Route path="/admin/paymenthistory" element={<PaymentHistories />}></Route>
-        
-        <Route path="/admin/paymenthistory/details" element={<FacultyPaymentDetails />}></Route>
+          <Route path="/admin/paymenthistory" element={<PaymentHistories />} ></Route>
 
-        <Route path="/admin/facultymanager" element={<FacultyManagement />}></Route>
-        
-        <Route path="/admin/facultymanager/details" element={<FacultyDetails />}></Route>
+          <Route path="/admin/paymenthistory/details" element={<FacultyPaymentDetails />} ></Route>
 
-        <Route path="/admin/facultymanager/details/subject" element={<SubjectRemunerationDetails /> }></Route>
+          <Route path="/admin/facultymanager" element={<FacultyManagement />} ></Route>
+
+          <Route path="/admin/facultymanager/details" element={<FacultyDetails />} ></Route>
+
+          <Route path="/admin/facultymanager/details/subject" element={<SubjectRemunerationDetails /> }></Route>
          
-        <Route path="/admin/facultymanager/add" element={<AddFacultyForm /> }></Route>
+          <Route path="/admin/facultymanager/add" element={<AddFacultyForm /> }></Route>
 
-        <Route path="/admin/facultymanager/edit/:id" element={<EditFaculty /> }></Route>
+          <Route path="/admin/facultymanager/edit/:id" element={<EditFaculty /> }></Route>
 
-        {/* Faculty Routes */}
-        <Route path="/faculty/dashboard" element={ <FacultyDashboard /> }> </Route>
-
-        <Route path="/faculty/payments" element={ <FacultyPayments /> }> </Route>
-
-        <Route path="/faculty/payments/subjectremu" element={ <SubjectRemuneration /> }> </Route>
-
-        <Route path="/faculty/payments/overall" element={ <OverallSlip /> }> </Route>
+          {/* Faculty Routes */}
+          <Route path="/faculty/dashboard" element={ <FacultyDashboard /> }> </Route>
+  
+          <Route path="/faculty/payments" element={ <FacultyPayments /> }> </Route>
+  
+          <Route path="/faculty/payments/subjectremu" element={ <SubjectRemuneration /> }> </Route>
+  
+          <Route path="/faculty/payments/overall" element={ <OverallSlip /> }> </Route>
+  
+          <Route path="/reset-password/:token" element={<ResetPassword />} ></Route>
+  
+          <Route path="/forgot-password" element={<ForgotPassword />}></Route>
+        </Route>
       </Routes>
     </>
   );

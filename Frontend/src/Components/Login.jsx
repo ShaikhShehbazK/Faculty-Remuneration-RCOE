@@ -1,9 +1,9 @@
 import React, { useState } from "react";
 import axios from "axios";
-import { useNavigate } from 'react-router-dom';
+import { useNavigate } from "react-router-dom";
 
 function Login() {
-  const [loginRole, setLoginRole] = useState("faculty"); // faculty or admin
+  const [loginRole, setLoginRole] = useState("faculty");
   const [formData, setFormData] = useState({
     username: "",
     password: "",
@@ -19,206 +19,166 @@ function Login() {
     }));
   };
 
-/*
-const handleSubmit = (e) => {
-  e.preventDefault();
-  const payload = {
-     role: loginRole, 
-    ...(loginRole === "faculty"
-      ? { username: formData.username, password: formData.password }
-      : { adminId: formData.adminId, password: formData.password }),
-  };
-  console.log("Submitting:", payload); 
-  // Send `payload` to backend
-}; 
-*/
+  const handleSubmit = async (e) => {
+    e.preventDefault();
 
-const handleSubmit = async (e) => {
-  e.preventDefault();
+    const payload =
+      loginRole === "faculty"
+        ? {
+            username: formData.username,
+            password: formData.password,
+          }
+        : {
+            email: formData.adminId,
+            password: formData.password,
+          };
 
-  const payload =
-    loginRole === "faculty"
-      ? {
-          username: formData.username,
-          password: formData.password,
+    try {
+      if (loginRole === "admin") {
+        const response = await axios.post(
+          "http://localhost:3002/admin/login",
+          payload
+        );
+        if (response.data.token) {
+          alert("Admin Login Successful ✅");
+          localStorage.setItem("token", response.data.token);
+          setFormData({ username: "", password: "", adminId: "" });
+          navigate("/admin/payments");
+        } else {
+          alert("Unexpected response from server");
         }
-      : {
-          email: formData.adminId, // Temporarily using adminId field as email.
-          password: formData.password,
-        };
-
-  try {
-    if (loginRole === "admin") {
-      const response = await axios.post("http://localhost:3002/admin/login", payload);
-
-      if (response.data.token) {
-        alert("Admin Login Successful ✅");
-
-        // Save token
-        localStorage.setItem("token", response.data.token);
-
-        // Clear form
-        setFormData({
-          username: "",
-          password: "",
-          adminId: "",
-        });
-
-        // Navigate to /admin/payments
-        navigate("/admin/payments");
       } else {
-        alert("Unexpected response from server");
+        alert("Faculty login not implemented yet");
       }
-    } else {
-      alert("Faculty login not implemented yet");
+    } catch (err) {
+      alert(err?.response?.data?.message || "Login failed. Check console.");
     }
-  } catch (err) {
-    console.error("Login failed:", err);
-    alert(
-      err?.response?.data?.message || "Login failed. Check console for details."
-    );
-  }
-};
-
+  };
 
   return (
-    <>
-      <div className="min-vh-100 bg-light d-flex flex-column">
-        {/* Header */}
-        <header className="d-flex justify-content-between align-items-center border-bottom px-4 py-3 bg-white shadow-sm">
-          <div className="d-flex align-items-center gap-3">
-            {/* RCOE Logo */}
-            <img
-              src="rcoe logo.jpg"
-              alt=""
-              height="40"
-              style={{ objectFit: "contain" }}
-            />
-            <h5 className="mb-0 fw-bold">Faculty Remuneration System</h5>
-          </div>
-          {/* <a href="#" className="text-primary fw-medium">Sign Up</a> */}
-        </header>
+    <div className="min-vh-100 bg-light d-flex flex-column">
+      {/* Header */}
+      <header className="d-flex justify-content-between align-items-center border-bottom px-4 py-3 bg-white shadow-sm">
+        <div className="d-flex align-items-center gap-3">
+          <img
+            src="/rcoe-logo.jpg"
+            alt="Logo"
+            height="40"
+            style={{ objectFit: "contain" }}
+          />
+          <h5 className="mb-0 fw-bold text-dark">
+            Faculty Remuneration Portal
+          </h5>
+        </div>
+      </header>
 
-        {/* Main */}
-        <main className="container my-5 d-flex flex-column align-items-center justify-content-center flex-grow-1">
-          {/* Image */}
-          <div className="text-center mb-4 w-100" style={{ maxWidth: "700px" }}>
-            <img
-              src="863c57b1.jpg"
-              className="img-fluid rounded"
-              alt="College Banner"
-              style={{ maxHeight: "220px", width: "100%", objectFit: "cover" }}
-            />
-          </div>
+      {/* Main */}
+      <main className="container my-5 d-flex flex-column align-items-center justify-content-center flex-grow-1">
+        {/* College Banner */}
+        <div className="text-center mb-4 w-100" style={{ maxWidth: "700px" }}>
+          <img
+            src="/college-banner.jpg"
+            className="img-fluid rounded"
+            alt="College Banner"
+            style={{ maxHeight: "200px", width: "100%", objectFit: "cover" }}
+          />
+        </div>
 
-          <h3 className="fw-bold text-center mb-3">
-            Welcome to Rizvi College of Engineering
-          </h3>
+        {/* Title */}
+        <h3 className="fw-bold text-center text-primary mb-4">
+          Rizvi College of Engineering
+        </h3>
 
-          {/* Role Tabs */}
-          <ul className="nav nav-tabs mb-4">
-            <li className="nav-item">
+        {/* Role Tabs */}
+        <ul className="nav nav-tabs mb-4">
+          {["admin", "faculty"].map((role) => (
+            <li className="nav-item" key={role}>
               <button
-                className={`nav-link ₹{
-                  loginRole === "admin" ? "active fw-bold" : "text-secondary"
+                className={`nav-link ${
+                  loginRole === role ? "active fw-bold" : "text-secondary"
                 }`}
-                onClick={() => setLoginRole("admin")}
+                onClick={() => setLoginRole(role)}
               >
-                Admin
+                {role.charAt(0).toUpperCase() + role.slice(1)}
               </button>
             </li>
-            <li className="nav-item">
-              <button
-                className={`nav-link ₹{
-                  loginRole === "faculty" ? "active fw-bold" : "text-secondary"
-                }`}
-                onClick={() => setLoginRole("faculty")}
-              >
-                Faculty
-              </button>
-            </li>
-          </ul>
+          ))}
+        </ul>
 
-          {/* Login Form */}
-          <form
-            onSubmit={handleSubmit}
-            className="w-100"
-            style={{ maxWidth: "400px" }}
-          >
-            {loginRole === "faculty" ? (
-              <>
-                {/* Enter Faculty Username */}
-                <div className="mb-3">
-                  <label className="form-label">Username</label>
-                  <input
-                    type="text"
-                    name="username"
-                    className="form-control bg-light border-0 shadow-sm"
-                    value={formData.username}
-                    onChange={handleInputChange}
-                    placeholder="Enter your username"
-                    required
-                  />
-                </div>
-              </>
-            ) : (
-              <>
-                {/* Enter Admin ID */}
-                <div className="mb-3">
-                  <label className="form-label">Admin ID</label>
-                  <input
-                    type="email"
-                    name="adminId"
-                    className="form-control bg-light border-0 shadow-sm"
-                    value={formData.adminId}
-                    onChange={handleInputChange}
-                    placeholder="Enter your admin ID"
-                    required
-                  />
-                </div>
-              </>
-            )}
-
-            {/* Enter Password */}
+        {/* Form */}
+        <form
+          onSubmit={handleSubmit}
+          className="w-100 bg-white shadow-sm rounded p-4"
+          style={{ maxWidth: "400px" }}
+        >
+          {loginRole === "faculty" ? (
             <div className="mb-3">
-              <label className="form-label">Password</label>
+              <label className="form-label">Username</label>
               <input
-                type="password"
-                name="password"
-                className="form-control bg-light border-0 shadow-sm"
-                value={formData.password}
+                type="text"
+                name="username"
+                className="form-control"
+                value={formData.username}
                 onChange={handleInputChange}
-                placeholder="Enter your password"
+                placeholder="Enter your faculty username"
                 required
               />
             </div>
-
-            {/* Remember Me */}
-            <div className="d-flex justify-content-between align-items-center mb-3">
-              <span>Remember Me</span>
-              <input type="checkbox" className="form-check-input" />
+          ) : (
+            <div className="mb-3">
+              <label className="form-label">Admin Email</label>
+              <input
+                type="email"
+                name="adminId"
+                className="form-control"
+                value={formData.adminId}
+                onChange={handleInputChange}
+                placeholder="Enter admin email"
+                required
+              />
             </div>
+          )}
 
-            {/* Login Button */}
-            <div className="d-grid mb-2">
-              <button
-                className="btn btn-primary fw-bold rounded-pill py-2"
-                type="submit"
-              >
-                Login
-              </button>
-            </div>
+          <div className="mb-3">
+            <label className="form-label">Password</label>
+            <input
+              type="password"
+              name="password"
+              className="form-control"
+              value={formData.password}
+              onChange={handleInputChange}
+              onFocus={(e) => {
+                e.target.readOnly = false;
+              }}
+              readOnly
+              placeholder="Enter your password"
+              required
+            />
+          </div>
 
-            {/* Forgot Password */}
-            <p className="text-center text-muted small">
-              <a href="#" className="text-decoration-underline">
-                Forgot Password?
-              </a>
-            </p>
-          </form>
-        </main>
-      </div>
-    </>
+          <div className="d-flex justify-content-between align-items-center mb-3">
+            <span className="small text-muted">Remember Me</span>
+            <input type="checkbox" className="form-check-input" />
+          </div>
+
+          <div className="d-grid mb-3">
+            <button className="btn btn-primary rounded-pill py-2 fw-bold">
+              Login
+            </button>
+          </div>
+
+          <p className="text-center">
+            <button
+              className="btn btn-link text-decoration-none small"
+              onClick={() => navigate(`/forgot-password?role=${loginRole}`)}
+              type="button"
+            >
+              Forgot Password?
+            </button>
+          </p>
+        </form>
+      </main>
+    </div>
   );
 }
 
