@@ -14,8 +14,7 @@ facultyManagement.post(
 // ✅ Get All Faculties
 facultyManagement.get(
   "/getAll",
-  jwtAuthMiddleware,
-  isAdmin,
+  
   facultyManagementC.getAllFaculties
 );
 

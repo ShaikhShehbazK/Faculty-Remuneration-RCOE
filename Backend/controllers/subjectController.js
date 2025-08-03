@@ -13,14 +13,6 @@ const Subject = require("../models/subjects");
 
 exports.getSubjects = async (req, res) => {
   try {
-    // ✅ Fetch by Subject ID (if provided)
-    if (req.query.id) {
-      const subject = await Subject.findById(req.query.id);
-      if (!subject) {
-        return res.status(404).json({ error: "Subject not found" });
-      }
-      return res.json(subject);
-    }
 
     // ✅ Filter by semester and/or department
     const filters = {};
@@ -41,6 +33,7 @@ exports.getSubjects = async (req, res) => {
   }
 };
 
+// ✅ Fetch Subject details by Subject ID
 exports.getSubjectById = async (req, res) => {
   try {
     const subject = await Subject.findById(req.params.id);
@@ -53,27 +46,6 @@ exports.getSubjectById = async (req, res) => {
     res.status(500).json({ error: "Failed to fetch subject" });
   }
 };
-
-
-/* exports.getSubjects = async (req, res) => {
-  try {
-    const filters = {};
-
-    if (req.query.semester) {
-      filters.semester = Number(req.query.semester);
-    }
-
-    if (req.query.department) {
-      filters.department = req.query.department;
-    }
-
-    const subjects = await Subject.find(filters).sort({ semester: 1, name: 1 });
-    res.json(subjects);
-  } catch (err) {
-    res.status(500).json({ error: "Failed to fetch subjects" });
-  }
-};  */
-
 
 exports.postCreate = async (req, res) => {
   try {

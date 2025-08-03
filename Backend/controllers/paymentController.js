@@ -2,6 +2,20 @@ const Faculty = require("../models/faculty");
 const Subject = require("../models/subjects");
 const Payment = require("../models/payment");
 
+// Get all payments
+exports.getAllPayments = async (req, res) => {
+  try {
+    const payments = await Payment.find({})
+      .populate('facultyId', 'name email department designation')
+      .sort({ createdAt: -1 }); // Most recent first
+
+    res.json(payments);
+  } catch (error) {
+    console.error('Error fetching payments:', error);
+    res.status(500).json({ error: 'Failed to fetch payment data' });
+  }
+};
+
 // Get all faculty members
 exports.getAllFaculty = async (req, res) => {
   try {

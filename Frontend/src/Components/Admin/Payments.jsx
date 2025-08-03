@@ -124,7 +124,7 @@ function Payments() {
         }
 
         // Fetch subject details from MongoDB
-        const response = await axios.get(`http://localhost:3002/faculty/subject/getById/${selectedSubjectObj.subjectId}`);
+        const response = await axios.get(`http://localhost:3002/faculty/subject/getList/${selectedSubjectObj.subjectId}`);
         console.log('Subject details:', response.data);
         setSelectedSubjectDetails(response.data);
       } catch (error) {

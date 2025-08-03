@@ -13,6 +13,13 @@ subjectRouter.get(
   subjectController.getSubjects
 );
 
+// ✅ GET subject by Id
+subjectRouter.get(
+  "/getList/:id",
+  
+  subjectController.getSubjectById
+);
+
 // ✅ POST create new subject
 subjectRouter.post(
   "/create",

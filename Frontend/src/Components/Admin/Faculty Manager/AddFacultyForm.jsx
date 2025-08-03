@@ -4,6 +4,7 @@ import { FaArrowLeft, FaUserPlus, FaUserTie, FaBookOpen, FaEnvelope, FaPhone } f
 import { useNavigate } from 'react-router-dom';
 import api from '../../../utils/api';
 import Select from 'react-select';
+import axios from 'axios';
 
 function AddFacultyForm() {
   const navigate = useNavigate();
@@ -38,8 +39,17 @@ function AddFacultyForm() {
     console.log("Fetching subjects for semester:", formData.semester);
     if (formData.semester && formData.semester !== 'Select') {
       try {
+        //Sending token to backend for authentication 
+       /* const token = JSON.parse(localStorage.getItem("token"));
+        console.log(token);
+        const header = {
+          headers: {
+            Authorization: `Bearer ${token}`, //Passing the token in Authorization Header
+          },
+        };  */
         const res = await api.get(`/faculty/subject/getList?semester=${formData.semester}`);
         console.log(res.data);
+
         const subjectNames = res.data.map((subj) => subj.name); // assuming Subject has a 'name'
         setSubjectOptions(subjectNames);
       } catch (err) {
