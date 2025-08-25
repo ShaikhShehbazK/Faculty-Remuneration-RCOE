@@ -1,54 +1,106 @@
-
-import { Container, Row, Col, Table, Button, Card, Badge } from 'react-bootstrap';
-import { FaPrint, FaFileInvoiceDollar, FaDownload, FaEye, FaCalculator, FaMoneyBillWave, FaInfoCircle, FaArrowLeft } from 'react-icons/fa';
-import { useNavigate } from 'react-router-dom';
+import { useEffect, useState } from "react";
+import { Container, Row, Col, Table, Button, Card, Badge, Spinner, Alert } from "react-bootstrap";
+import { FaPrint, FaFileInvoiceDollar, FaDownload, FaEye, FaCalculator, FaMoneyBillWave, FaInfoCircle, FaArrowLeft } from "react-icons/fa";
+import { useNavigate, useParams } from "react-router-dom";
+import axios from "axios";
+import api from "../../../utils/api";
 
 function SubjectRemunerationDetails() {
+  const { id, subjectId , academicYear} = useParams(); // id = facultyId
   const navigate = useNavigate();
-  
-  const data = {
-    subject: "Data Structures and Algorithms",
-    semester: "Semester 3",
-    referenceNumber: "REM-2023-001",
-    facultyName: "Prof. Manila Gupta",
-    department: "Computer Engineering",
-    total: 5000,
-    breakdown: [
-      {
-        component: "Term Work Papers Assessed",
-        rate: 50,
-        quantity: 50,
-        amount: 2500,
-        color: "primary"
-      },
-      {
-        component: "Oral/Practicals",
-        rate: 30,
-        quantity: 50,
-        amount: 1500,
-        color: "success"
-      },
-      {
-        component: "Semester Papers Assessed",
-        rate: 50,
-        quantity: 20,
-        amount: 1000,
-        color: "info"
+
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
+  const [subjectData, setSubjectData] = useState([]);
+
+  useEffect(() => {
+    const fetchFacultyDetails = async () => {
+      try {
+        setLoading(true);
+        const res = await axios.get(`http://localhost:3002/admin/payment/getSinglePayment/${id}/${subjectId}/${academicYear}`);
+        console.log("Fetched Subject Payments for SubjectRemunerationDetails page :");
+        console.log(res.data);
+        
+        // Extract single subject breakdown from API
+        const breakdownItem = res.data.breakdown[0]; // Only 1 because subjectId was passed
+
+        // Prepare frontend structure
+        setSubjectData({
+          facultyName: res.data.facultyName,
+          department: res.data.department,
+          subjectName: breakdownItem.subjectName,
+          academicYear: breakdownItem.academicYear,
+          semesterType: breakdownItem.semesterType, 
+          semester: breakdownItem.semester,
+          total: breakdownItem.subjectTotal,
+          referenceNumber: `REF-${Date.now()}`,
+          breakdown: [
+            {
+              component: "Term Work Papers Assessed",
+              rate: breakdownItem.termTestAssessment.rate,
+              quantity: breakdownItem.termTestAssessment.count,
+              amount: breakdownItem.termTestAssessment.amount,
+              color: "primary",
+            },
+            {
+              component: "Oral/Practicals",
+              rate: breakdownItem.oralPracticalAssessment.rate,
+              quantity: breakdownItem.oralPracticalAssessment.count,
+              amount: breakdownItem.oralPracticalAssessment.amount,
+              color: "success",
+            },
+            {
+              component: "Semester Papers Assessed",
+              rate: breakdownItem.paperChecking.rate,
+              quantity: breakdownItem.paperChecking.count,
+              amount: breakdownItem.paperChecking.amount,
+              color: "info",
+            },
+          ],
+        });
+      } catch (err) {
+        console.error("❌ Error fetching remuneration:", err);
+        setError(
+          err.response?.data?.message || "Failed to load remuneration details"
+        );
+      } finally {
+        setLoading(false);
       }
-    ]
-  };
+    };
+
+    fetchFacultyDetails();
+  }, [id, subjectId]);
 
   const handleGoBack = () => {
-    navigate('/admin/facultymanager/details');
+    navigate(`/admin/facultymanager/details/${id}`);
   };
+
+  if (loading) {
+    return (
+      <div className="d-flex justify-content-center align-items-center vh-100">
+        <Spinner animation="border" variant="primary" />
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <Container className="p-4">
+        <Alert variant="danger">{error}</Alert>
+        <Button variant="secondary" onClick={handleGoBack}>
+          <FaArrowLeft /> Back
+        </Button>
+      </Container>
+    );
+  }
 
   return (
     <Container fluid className="p-4 bg-light min-vh-100">
       {/* Desktop Header */}
       <div className="d-none d-md-flex d-flex justify-content-between align-items-center mb-4">
         <div className="d-flex align-items-center gap-3">
-          <Button 
-            variant="outline-secondary" 
+          <Button
+            variant="outline-secondary"
             className="d-flex align-items-center gap-2"
             onClick={handleGoBack}
           >
@@ -56,24 +108,29 @@ function SubjectRemunerationDetails() {
           </Button>
           <div>
             <h2 className="mb-1 fw-bold">Remuneration Details</h2>
-            <p className="text-muted mb-0">Detailed breakdown of remuneration for the subject</p>
+            <p className="text-muted mb-0">
+              Detailed breakdown of remuneration for the subject
+            </p>
           </div>
         </div>
-        <div className="d-flex gap-2">
-          <Button variant="outline-primary" className="d-flex align-items-center gap-2">
+        {/* <div className="d-flex gap-2">
+          <Button
+            variant="outline-primary"
+            className="d-flex align-items-center gap-2"
+          >
             <FaDownload /> Export
           </Button>
           <Button variant="primary" className="d-flex align-items-center gap-2">
             <FaPrint /> Print
           </Button>
-        </div>
+        </div> */}
       </div>
 
       {/* Mobile Header */}
       <div className="d-md-none d-flex justify-content-between align-items-center mb-4">
         <div className="d-flex align-items-center gap-3">
-          <Button 
-            variant="outline-secondary" 
+          <Button
+            variant="outline-secondary"
             className="d-flex align-items-center gap-2"
             onClick={handleGoBack}
           >
@@ -83,14 +140,17 @@ function SubjectRemunerationDetails() {
             <h3 className="mb-1 fw-bold">Remuneration Details</h3>
           </div>
         </div>
-        <div className="d-flex flex-column gap-2">
-          <Button variant="outline-primary" className="d-flex align-items-center gap-2">
+        {/* <div className="d-flex flex-column gap-2">
+          <Button
+            variant="outline-primary"
+            className="d-flex align-items-center gap-2"
+          >
             <FaDownload /> Export
           </Button>
           <Button variant="primary" className="d-flex align-items-center gap-2">
             <FaPrint /> Print
           </Button>
-        </div>
+        </div> */}
       </div>
 
       {/* Subject Information Card */}
@@ -101,38 +161,56 @@ function SubjectRemunerationDetails() {
           </div>
           <div>
             <h5 className="fw-bold mb-1">Subject Information</h5>
-            <small className="text-muted">Basic details about the subject and faculty</small>
+            <small className="text-muted">
+              Basic details about the subject and faculty
+            </small>
           </div>
         </div>
-        
+
         <Row>
           <Col md={6} className="mb-3">
             <div className="d-flex align-items-center gap-2 mb-2">
               <FaInfoCircle className="text-muted" size={16} />
               <span className="text-muted small fw-medium">Subject Name</span>
             </div>
-            <h6 className="fw-bold mb-0">{data.subject}</h6>
+            <h6 className="fw-bold mb-0">{subjectData.subjectName}</h6>
+          </Col>
+          <Col md={6} className="mb-3">
+            <div className="d-flex align-items-center gap-2 mb-2">
+              <FaInfoCircle className="text-muted" size={16} />
+              <span className="text-muted small fw-medium">Academic Year</span>
+            </div>
+            <h6 className="fw-bold mb-0">{subjectData.academicYear}</h6>
+          </Col>
+          <Col md={6} className="mb-3">
+            <div className="d-flex align-items-center gap-2 mb-2">
+              <FaInfoCircle className="text-muted" size={16} />
+              <span className="text-muted small fw-medium">Semester Type</span>
+            </div>
+            <h6 className="fw-bold mb-0">{subjectData.semesterType}</h6>
           </Col>
           <Col md={6} className="mb-3">
             <div className="d-flex align-items-center gap-2 mb-2">
               <FaInfoCircle className="text-muted" size={16} />
               <span className="text-muted small fw-medium">Semester</span>
             </div>
-            <Badge bg="info" className="px-3 py-2 fs-6">{data.semester}</Badge>
+            <Badge bg="info" className="px-3 py-2 fs-6">
+              Semester {subjectData.semester}
+            </Badge>
           </Col>
           <Col md={6} className="mb-3">
             <div className="d-flex align-items-center gap-2 mb-2">
               <FaInfoCircle className="text-muted" size={16} />
               <span className="text-muted small fw-medium">Faculty Member</span>
             </div>
-            <h6 className="fw-bold mb-0">{data.facultyName}</h6>
+            <h6 className="fw-bold mb-0">{subjectData.facultyName}</h6>
           </Col>
           <Col md={6} className="mb-3">
             <div className="d-flex align-items-center gap-2 mb-2">
               <FaInfoCircle className="text-muted" size={16} />
               <span className="text-muted small fw-medium">Department</span>
             </div>
-            <h6 className="fw-bold mb-0">{data.department}</h6>
+            <h6 className="fw-bold mb-0">{subjectData.department}</h6>
           </Col>
         </Row>
       </Card>
@@ -145,7 +223,9 @@ function SubjectRemunerationDetails() {
           </div>
           <div>
             <h5 className="fw-bold mb-1">Remuneration Breakdown</h5>
-            <small className="text-muted">Detailed calculation of each component</small>
+            <small className="text-muted">
+              Detailed calculation of each component
+            </small>
           </div>
         </div>
 
@@ -159,22 +239,31 @@ function SubjectRemunerationDetails() {
             </tr>
           </thead>
           <tbody>
-            {data.breakdown.map((item, index) => (
+            {subjectData.breakdown.map((item, index) => (
               <tr key={index}>
                 <td className="fw-medium">
                   <div className="d-flex align-items-center gap-2">
-                    <div className={`bg-${item.color} bg-opacity-10 p-2 rounded-2`}>
-                      <FaCalculator className={`text-${item.color}`} size={14} />
+                    <div
+                      className={`bg-${item.color} bg-opacity-10 p-2 rounded-2`}
+                    >
+                      <FaCalculator
+                        className={`text-${item.color}`}
+                        size={14}
+                      />
                     </div>
                     {item.component}
                   </div>
                 </td>
                 <td className="text-center">
-                  <Badge bg="secondary" className="px-3 py-2">₹{item.rate}</Badge>
+                  <Badge bg="secondary" className="px-3 py-2">
+                    ₹{item.rate}
+                  </Badge>
                 </td>
                 <td className="text-center fw-bold">{item.quantity}</td>
                 <td className="text-center">
-                  <span className="fw-bold text-success">₹{item.amount.toLocaleString()}</span>
+                  <span className="fw-bold text-success">
+                    ₹{item.amount.toLocaleString()}
+                  </span>
                 </td>
               </tr>
             ))}
@@ -190,35 +279,52 @@ function SubjectRemunerationDetails() {
           </div>
           <div>
             <h5 className="fw-bold mb-1">Payment Summary</h5>
-            <small className="text-muted">Final calculation and payment details</small>
+            <small className="text-muted">
+              Final calculation and payment details
+            </small>
           </div>
         </div>
 
         <Row className="align-items-end">
+          {/* Display Of Reference Number
           <Col md={6}>
             <div className="d-flex align-items-center gap-2 mb-2">
               <FaInfoCircle className="text-muted" size={16} />
-              <span className="text-muted small fw-medium">Reference Number</span>
+              <span className="text-muted small fw-medium">
+                Reference Number
+              </span>
             </div>
-            <h6 className="fw-bold mb-0 text-primary">{data.referenceNumber}</h6>
-          </Col>
+            <h6 className="fw-bold mb-0 text-primary">
+              {subjectData.referenceNumber}
+            </h6>
+          </Col> 
+          */}
+
           <Col md={6} className="text-md-end">
             <div className="d-flex align-items-center gap-2 mb-2 justify-content-md-end">
               <FaMoneyBillWave className="text-success" size={16} />
-              <span className="text-muted small fw-medium">Total Remuneration</span>
+              <span className="text-muted small fw-medium">
+                Total Remuneration
+              </span>
             </div>
-            <h3 className="fw-bold text-success mb-0">₹{data.total.toLocaleString()}</h3>
+            <h3 className="fw-bold text-success mb-0">
+              ₹{subjectData.total.toLocaleString()}
+            </h3>
           </Col>
         </Row>
 
-        <div className="d-flex justify-content-end gap-3 mt-4">
-          <Button variant="outline-secondary" className="d-flex align-items-center gap-2">
+        {/* Buttons
+         <div className="d-flex justify-content-end gap-3 mt-4">
+          <Button
+            variant="outline-secondary"
+            className="d-flex align-items-center gap-2"
+          >
             <FaEye /> View Details
           </Button>
           <Button variant="success" className="d-flex align-items-center gap-2">
             <FaFileInvoiceDollar /> Generate Invoice
           </Button>
-        </div>
+        </div> */}
       </Card>
 
       {/* Footer */}

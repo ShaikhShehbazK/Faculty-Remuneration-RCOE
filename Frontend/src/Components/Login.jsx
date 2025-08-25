@@ -25,7 +25,7 @@ function Login() {
     const payload =
       loginRole === "faculty"
         ? {
-            username: formData.username,
+            email: formData.username,
             password: formData.password,
           }
         : {
@@ -48,7 +48,20 @@ function Login() {
           alert("Unexpected response from server");
         }
       } else {
-        alert("Faculty login not implemented yet");
+        const response = await axios.post(
+          "http://localhost:3002/faculty/login",
+          payload
+        );
+
+        if (response.data.token) {
+          alert("Faculty Login Successful ✅");
+          console.log(response.data);
+          localStorage.setItem("token", response.data.token);
+          localStorage.setItem("role", "faculty");
+          localStorage.setItem("facultyId", response.data.id); // 👈 save id for dashboard
+          setFormData({ username: "", password: "", adminId: "" });
+          navigate("/faculty/dashboard"); // 👈 redirect to faculty dashboard
+        }
       }
     } catch (err) {
       alert(err?.response?.data?.message || "Login failed. Check console.");

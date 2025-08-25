@@ -3,26 +3,44 @@ const facultyManagement = express.Router();
 const facultyManagementC = require("../controllers/facultyManagementC");
 const { jwtAuthMiddleware } = require("../jwt");
 const isAdmin = require("../controllers/isAdmin");
+
 // ✅ Add New Faculty
 facultyManagement.post(
   "/add",
-  jwtAuthMiddleware,
-  isAdmin,
+  /* jwtAuthMiddleware,
+  isAdmin,  */
   facultyManagementC.addFaculty
 );
 
-// ✅ Get All Faculties
+// Update subject assignment
+facultyManagement.put(
+  "/:id/update",
+  jwtAuthMiddleware,
+  isAdmin,  
+  facultyManagementC.updateAssignments
+);
+
+// Remove asssigned subjects
+facultyManagement.put(
+  "/:id/remove-subject",
+  /* jwtAuthMiddleware,
+  isAdmin, */  
+  facultyManagementC.removeSubject
+);
+
+// ✅ Get All Faculties 
 facultyManagement.get(
   "/getAll",
-  
+  jwtAuthMiddleware,
+  isAdmin,
   facultyManagementC.getAllFaculties
 );
 
 // ✅ Get Single Faculty by ID
 facultyManagement.get(
   "/getSingle/:id",
-  jwtAuthMiddleware,
-  isAdmin,
+  /* jwtAuthMiddleware,
+  isAdmin, */
   facultyManagementC.getSingleFaculty
 );
 

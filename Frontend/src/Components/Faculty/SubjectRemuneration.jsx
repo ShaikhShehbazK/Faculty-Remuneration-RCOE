@@ -1,274 +1,338 @@
-
-import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { Container, Row, Col, Button, Table, Nav, Card, Offcanvas, Badge } from "react-bootstrap";
-import { FaBars, FaPrint, FaDownload, FaFileInvoiceDollar, FaArrowLeft } from "react-icons/fa";
-import FacultySidebar from '../FacultySidebar';
-
-const remunerationData = {
-  subjectName: "Machine Learning",
-  semester: "Odd Semester 2024",
-  referenceNumber: "REF-2024-03-001",
-  facultyName: "Prof. Mohd Ashfaque",
-  department: "Computer Engineering",
-  components: [
-    {
-      name: "Term Work Papers Assessed",
-      rate: 50,
-      quantity: 200,
-      amount: 10000,
-    },
-    {
-      name: "Oral/Practicals",
-      rate: 75,
-      quantity: 100,
-      amount: 7500,
-    },
-    {
-      name: "Semester Papers Assessed",
-      rate: 100,
-      quantity: 50,
-      amount: 5000,
-    },
-  ],
-};
+import { useEffect, useState } from "react";
+import { Container, Row, Col, Table, Button, Card, Badge, Spinner, Alert } from "react-bootstrap";
+import { FaPrint, FaFileInvoiceDollar, FaDownload, FaEye, FaCalculator, FaMoneyBillWave, FaInfoCircle, FaArrowLeft } from "react-icons/fa";
+import { useNavigate, useParams } from "react-router-dom";
+import axios from "axios";
+/* import api from "../../../utils/api"; */
 
 function SubjectRemuneration() {
-  const [showSidebar, setShowSidebar] = useState(false);
+  const { id, subjectId , academicYear} = useParams(); // id = facultyId
   const navigate = useNavigate();
-  const handleSidebarOpen = () => setShowSidebar(true);
-  const handleSidebarClose = () => setShowSidebar(false);
 
-  const totalAmount = remunerationData.components.reduce(
-    (sum, item) => sum + item.amount,
-    0
-  );
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
+  const [subjectData, setSubjectData] = useState([]);
 
-  const handlePrint = () => {
-    window.print();
+  useEffect(() => {
+    const facultyId = localStorage.getItem("facultyId");
+    const fetchFacultyDetails = async () => {
+      try {
+        setLoading(true);
+        const res = await axios.get(`http://localhost:3002/admin/payment/getSinglePayment/${facultyId}/${subjectId}/${academicYear}`);
+        console.log("Fetched Subject Payments for SubjectRemuneration page for Faculty :");
+        console.log(res.data);
+        
+        // Extract single subject breakdown from API
+        const breakdownItem = res.data.breakdown[0]; // Only 1 because subjectId was passed
+
+        // Prepare frontend structure
+        setSubjectData({
+          facultyName: res.data.facultyName,
+          department: res.data.department,
+          subjectName: breakdownItem.subjectName,
+          academicYear: breakdownItem.academicYear,
+          semesterType: breakdownItem.semesterType, 
+          semester: breakdownItem.semester,
+          total: breakdownItem.subjectTotal,
+          referenceNumber: `REF-${Date.now()}`,
+          breakdown: [
+            {
+              component: "Term Work Papers Assessed",
+              rate: breakdownItem.termTestAssessment.rate,
+              quantity: breakdownItem.termTestAssessment.count,
+              amount: breakdownItem.termTestAssessment.amount,
+              color: "primary",
+            },
+            {
+              component: "Oral/Practicals",
+              rate: breakdownItem.oralPracticalAssessment.rate,
+              quantity: breakdownItem.oralPracticalAssessment.count,
+              amount: breakdownItem.oralPracticalAssessment.amount,
+              color: "success",
+            },
+            {
+              component: "Semester Papers Assessed",
+              rate: breakdownItem.paperChecking.rate,
+              quantity: breakdownItem.paperChecking.count,
+              amount: breakdownItem.paperChecking.amount,
+              color: "info",
+            },
+          ],
+        });
+      } catch (err) {
+        console.error("❌ Error fetching remuneration:", err);
+        setError(
+          err.response?.data?.message || "Failed to load remuneration details"
+        );
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchFacultyDetails();
+  }, [id, subjectId]);
+
+  const handleGoBack = () => {
+    navigate(`/faculty/payments`);
   };
 
-  const handleBack = () => {
-    navigate('/faculty/payments');
-  };
+  if (loading) {
+    return (
+      <div className="d-flex justify-content-center align-items-center vh-100">
+        <Spinner animation="border" variant="primary" />
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <Container className="p-4">
+        <Alert variant="danger">{error}</Alert>
+        <Button variant="secondary" onClick={handleGoBack}>
+          <FaArrowLeft /> Back
+        </Button>
+      </Container>
+    );
+  }
 
   return (
     <Container fluid className="p-4 bg-light min-vh-100">
-      
-      {/* Mobile Hamburger Header */}
-      <div className="d-flex d-md-none align-items-center mb-3">
-        <Button variant="outline-primary" className="me-2" onClick={handleSidebarOpen}>
-          <FaBars size={20} />
-        </Button>
-        <h5 className="mb-0 fw-bold">Subject Remuneration</h5>
+      {/* Desktop Header */}
+      <div className="d-none d-md-flex d-flex justify-content-between align-items-center mb-4">
+        <div className="d-flex align-items-center gap-3">
+          <Button
+            variant="outline-secondary"
+            className="d-flex align-items-center gap-2"
+            onClick={handleGoBack}
+          >
+            <FaArrowLeft /> Back
+          </Button>
+          <div>
+            <h2 className="mb-1 fw-bold">Remuneration Details</h2>
+            <p className="text-muted mb-0">
+              Detailed breakdown of remuneration for the subject
+            </p>
+          </div>
+        </div>
+        {/* <div className="d-flex gap-2">
+          <Button
+            variant="outline-primary"
+            className="d-flex align-items-center gap-2"
+          >
+            <FaDownload /> Export
+          </Button>
+          <Button variant="primary" className="d-flex align-items-center gap-2">
+            <FaPrint /> Print
+          </Button>
+        </div> */}
       </div>
 
-      <Row>
-        {/* Sidebar: Offcanvas for mobile */}
-        <Offcanvas show={showSidebar} onHide={handleSidebarClose} className="d-md-none" backdrop>
-          <Offcanvas.Header closeButton>
-            <Offcanvas.Title>Menu</Offcanvas.Title>
-          </Offcanvas.Header>
-          <Offcanvas.Body>
-            <FacultySidebar />
-            <div className="text-muted small mt-4">Role: Faculty Member</div>
-          </Offcanvas.Body>
-        </Offcanvas>
-
-        {/* Sidebar: static for desktop */}
-        <Col md={3} className="d-none d-md-block">
-          <Card
-            className="shadow-sm border-0 rounded-4 p-3 sticky-top"
-            style={{ minHeight: "90vh" }}
+      {/* Mobile Header */}
+      <div className="d-md-none d-flex justify-content-between align-items-center mb-4">
+        <div className="d-flex align-items-center gap-3">
+          <Button
+            variant="outline-secondary"
+            className="d-flex align-items-center gap-2"
+            onClick={handleGoBack}
           >
-            <FacultySidebar />
-            <div className="text-muted small mt-4">Role: Faculty Member</div>
-          </Card>
-        </Col>
-
-        {/* Main Content */}
-        <Col md={9}>
-          <div className="d-none d-md-block">
-            <div className="d-flex align-items-center mb-3">
-              <Button 
-                variant="outline-primary" 
-                className="me-3 d-flex align-items-center gap-2"
-                onClick={handleBack}
-              >
-                <FaArrowLeft /> Back
-              </Button>
-              <h2 className="mb-0 fw-bold">Subject Remuneration Breakdown</h2>
-            </div>
-            <hr className="mb-4" />
+            <FaArrowLeft /> Back
+          </Button>
+          <div>
+            <h3 className="mb-1 fw-bold">Remuneration Details</h3>
           </div>
-          <div className="d-md-none mb-3" />
+        </div>
+        {/* <div className="d-flex flex-column gap-2">
+          <Button
+            variant="outline-primary"
+            className="d-flex align-items-center gap-2"
+          >
+            <FaDownload /> Export
+          </Button>
+          <Button variant="primary" className="d-flex align-items-center gap-2">
+            <FaPrint /> Print
+          </Button>
+        </div> */}
+      </div>
 
-          {/* Subject Information Card */}
-          <Card className="mb-4 p-4 shadow rounded-4 border-0 bg-white">
+      {/* Subject Information Card */}
+      <Card className="mb-4 p-4 shadow rounded-4 border-0 bg-white">
+        <div className="d-flex align-items-center gap-3 mb-3">
+          <div className="bg-primary bg-opacity-10 p-3 rounded-3">
+            <FaCalculator className="text-primary" size={24} />
+          </div>
+          <div>
             <h5 className="fw-bold mb-1">Subject Information</h5>
-            <small className="text-muted mb-3 d-block">
-              Detailed information about the subject and remuneration calculation.
+            <small className="text-muted">
+              Basic details about the subject and faculty
             </small>
-            
-            <Row className="mt-3">
-              <Col md={6} className="mb-3">
-                <div className="text-muted small mb-1">Subject Name</div>
-                <div className="fw-bold">{remunerationData.subjectName}</div>
-              </Col>
-              <Col md={6} className="mb-3">
-                <div className="text-muted small mb-1">Semester</div>
-                <div className="fw-bold">{remunerationData.semester}</div>
-              </Col>
-              <Col md={6} className="mb-3">
-                <div className="text-muted small mb-1">Faculty Name</div>
-                <div className="fw-bold">{remunerationData.facultyName}</div>
-              </Col>
-              <Col md={6} className="mb-3">
-                <div className="text-muted small mb-1">Department</div>
-                <div className="fw-bold">{remunerationData.department}</div>
-              </Col>
-              <Col md={12} className="mb-3">
-                <div className="text-muted small mb-1">Reference Number</div>
-                <div className="fw-bold">
-                  <Badge bg="secondary" className="fs-6">{remunerationData.referenceNumber}</Badge>
-                </div>
-              </Col>
-            </Row>
-          </Card>
+          </div>
+        </div>
 
-          {/* Remuneration Summary Cards */}
-          <Row className="mb-4">
-            <Col md={4} className="mb-3">
-              <Card className="shadow-sm border-0 rounded-4 bg-white">
-                <Card.Body className="p-4">
-                  <div className="d-flex align-items-center">
-                    <div className="bg-primary bg-opacity-10 p-3 rounded-3 me-3">
-                      <FaFileInvoiceDollar size={24} className="text-primary" />
-                    </div>
-                    <div>
-                      <h6 className="text-muted mb-1">Total Amount</h6>
-                      <h4 className="fw-bold mb-0">₹{totalAmount.toLocaleString()}</h4>
-                    </div>
-                  </div>
-                </Card.Body>
-              </Card>
-            </Col>
-            <Col md={4} className="mb-3">
-              <Card className="shadow-sm border-0 rounded-4 bg-white">
-                <Card.Body className="p-4">
-                  <div className="d-flex align-items-center">
-                    <div className="bg-success bg-opacity-10 p-3 rounded-3 me-3">
-                      <FaFileInvoiceDollar size={24} className="text-success" />
-                    </div>
-                    <div>
-                      <h6 className="text-muted mb-1">Components</h6>
-                      <h4 className="fw-bold mb-0">{remunerationData.components.length}</h4>
-                    </div>
-                  </div>
-                </Card.Body>
-              </Card>
-            </Col>
-            <Col md={4} className="mb-3">
-              <Card className="shadow-sm border-0 rounded-4 bg-white">
-                <Card.Body className="p-4">
-                  <div className="d-flex align-items-center">
-                    <div className="bg-info bg-opacity-10 p-3 rounded-3 me-3">
-                      <FaFileInvoiceDollar size={24} className="text-info" />
-                    </div>
-                    <div>
-                      <h6 className="text-muted mb-1">Status</h6>
-                      <h4 className="fw-bold mb-0">
-                        <Badge bg="success">Completed</Badge>
-                      </h4>
-                    </div>
-                  </div>
-                </Card.Body>
-              </Card>
-            </Col>
-          </Row>
-
-          {/* Remuneration Components Table */}
-          <Card className="mb-4 p-4 shadow rounded-4 border-0 bg-white">
-            <h5 className="fw-bold mb-1">Remuneration Components</h5>
-            <small className="text-muted mb-3 d-block">
-              Detailed breakdown of all remuneration components and calculations.
-            </small>
-            
-            <Table
-              bordered
-              hover
-              responsive
-              striped
-              className="mt-3 align-middle"
-            >
-              <thead className="table-light">
-                <tr>
-                  <th>Component</th>
-                  <th>Rate (₹)</th>
-                  <th>Quantity</th>
-                  <th>Amount (₹)</th>
-                </tr>
-              </thead>
-              <tbody>
-                {remunerationData.components.map((item, index) => (
-                  <tr key={index}>
-                    <td className="fw-bold">{item.name}</td>
-                    <td>
-                      <span className="badge bg-secondary">{item.rate}</span>
-                    </td>
-                    <td>{item.quantity}</td>
-                    <td className="fw-bold text-success">₹{item.amount.toLocaleString()}</td>
-                  </tr>
-                ))}
-              </tbody>
-            </Table>
-
-            {/* Total Row */}
-            <div className="mt-4 p-3 bg-light rounded-3">
-              <div className="d-flex justify-content-between align-items-center">
-                <h5 className="fw-bold mb-0">Total Remuneration</h5>
-                <h4 className="fw-bold text-primary mb-0">₹{totalAmount.toLocaleString()}</h4>
-              </div>
+        <Row>
+          <Col md={6} className="mb-3">
+            <div className="d-flex align-items-center gap-2 mb-2">
+              <FaInfoCircle className="text-muted" size={16} />
+              <span className="text-muted small fw-medium">Subject Name</span>
             </div>
-          </Card>
-
-          {/* Action Buttons */}
-          <Card className="mb-4 p-4 shadow rounded-4 border-0 bg-white">
-            <h5 className="fw-bold mb-1">Actions</h5>
-            <small className="text-muted mb-3 d-block">
-              Download or print your remuneration details.
-            </small>
-            
-            <div className="d-flex gap-3">
-              <Button 
-                variant="primary" 
-                className="d-flex align-items-center gap-2"
-                onClick={handlePrint}
-              >
-                <FaPrint /> Print Remuneration
-              </Button>
-              <Button 
-                variant="outline-success" 
-                className="d-flex align-items-center gap-2"
-              >
-                <FaDownload /> Download PDF
-              </Button>
-              <Button 
-                variant="outline-secondary" 
-                className="d-flex align-items-center gap-2"
-              >
-                <FaFileInvoiceDollar /> Export Details
-              </Button>
+            <h6 className="fw-bold mb-0">{subjectData.subjectName}</h6>
+          </Col>
+          <Col md={6} className="mb-3">
+            <div className="d-flex align-items-center gap-2 mb-2">
+              <FaInfoCircle className="text-muted" size={16} />
+              <span className="text-muted small fw-medium">Academic Year</span>
             </div>
-          </Card>
-        </Col>
-      </Row>
+            <h6 className="fw-bold mb-0">{subjectData.academicYear}</h6>
+          </Col>
+          <Col md={6} className="mb-3">
+            <div className="d-flex align-items-center gap-2 mb-2">
+              <FaInfoCircle className="text-muted" size={16} />
+              <span className="text-muted small fw-medium">Semester Type</span>
+            </div>
+            <h6 className="fw-bold mb-0">{subjectData.semesterType}</h6>
+          </Col>
+          <Col md={6} className="mb-3">
+            <div className="d-flex align-items-center gap-2 mb-2">
+              <FaInfoCircle className="text-muted" size={16} />
+              <span className="text-muted small fw-medium">Semester</span>
+            </div>
+            <Badge bg="info" className="px-3 py-2 fs-6">
+              Semester {subjectData.semester}
+            </Badge>
+          </Col>
+          <Col md={6} className="mb-3">
+            <div className="d-flex align-items-center gap-2 mb-2">
+              <FaInfoCircle className="text-muted" size={16} />
+              <span className="text-muted small fw-medium">Faculty Member</span>
+            </div>
+            <h6 className="fw-bold mb-0">{subjectData.facultyName}</h6>
+          </Col>
+          <Col md={6} className="mb-3">
+            <div className="d-flex align-items-center gap-2 mb-2">
+              <FaInfoCircle className="text-muted" size={16} />
+              <span className="text-muted small fw-medium">Department</span>
+            </div>
+            <h6 className="fw-bold mb-0">{subjectData.department}</h6>
+          </Col>
+        </Row>
+      </Card>
+
+      {/* Remuneration Breakdown Card */}
+      <Card className="mb-4 p-4 shadow rounded-4 border-0 bg-white">
+        <div className="d-flex align-items-center gap-3 mb-3">
+          <div className="bg-success bg-opacity-10 p-3 rounded-3">
+            <FaMoneyBillWave className="text-success" size={24} />
+          </div>
+          <div>
+            <h5 className="fw-bold mb-1">Remuneration Breakdown</h5>
+            <small className="text-muted">
+              Detailed calculation of each component
+            </small>
+          </div>
+        </div>
+
+        <Table bordered hover responsive striped className="mt-3 align-middle">
+          <thead className="table-light">
+            <tr>
+              <th className="fw-bold">Component</th>
+              <th className="fw-bold text-center">Rate (₹)</th>
+              <th className="fw-bold text-center">Quantity</th>
+              <th className="fw-bold text-center">Amount (₹)</th>
+            </tr>
+          </thead>
+          <tbody>
+            {subjectData.breakdown.map((item, index) => (
+              <tr key={index}>
+                <td className="fw-medium">
+                  <div className="d-flex align-items-center gap-2">
+                    <div
+                      className={`bg-${item.color} bg-opacity-10 p-2 rounded-2`}
+                    >
+                      <FaCalculator
+                        className={`text-${item.color}`}
+                        size={14}
+                      />
+                    </div>
+                    {item.component}
+                  </div>
+                </td>
+                <td className="text-center">
+                  <Badge bg="secondary" className="px-3 py-2">
+                    ₹{item.rate}
+                  </Badge>
+                </td>
+                <td className="text-center fw-bold">{item.quantity}</td>
+                <td className="text-center">
+                  <span className="fw-bold text-success">
+                    ₹{item.amount.toLocaleString()}
+                  </span>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </Table>
+      </Card>
+
+      {/* Total Remuneration Card */}
+      <Card className="mb-4 p-4 shadow rounded-4 border-0 bg-white">
+        <div className="d-flex align-items-center gap-3 mb-3">
+          <div className="bg-warning bg-opacity-10 p-3 rounded-3">
+            <FaFileInvoiceDollar className="text-warning" size={24} />
+          </div>
+          <div>
+            <h5 className="fw-bold mb-1">Payment Summary</h5>
+            <small className="text-muted">
+              Final calculation and payment details
+            </small>
+          </div>
+        </div>
+
+        <Row className="align-items-end">
+          {/* Display Of Reference Number
+          <Col md={6}>
+            <div className="d-flex align-items-center gap-2 mb-2">
+              <FaInfoCircle className="text-muted" size={16} />
+              <span className="text-muted small fw-medium">
+                Reference Number
+              </span>
+            </div>
+            <h6 className="fw-bold mb-0 text-primary">
+              {subjectData.referenceNumber}
+            </h6>
+          </Col> 
+          */}
+
+          <Col md={6} className="text-md-end">
+            <div className="d-flex align-items-center gap-2 mb-2 justify-content-md-end">
+              <FaMoneyBillWave className="text-success" size={16} />
+              <span className="text-muted small fw-medium">
+                Total Remuneration
+              </span>
+            </div>
+            <h3 className="fw-bold text-success mb-0">
+              ₹{subjectData.total.toLocaleString()}
+            </h3>
+          </Col>
+        </Row>
+
+        {/* Buttons
+         <div className="d-flex justify-content-end gap-3 mt-4">
+          <Button
+            variant="outline-secondary"
+            className="d-flex align-items-center gap-2"
+          >
+            <FaEye /> View Details
+          </Button>
+          <Button variant="success" className="d-flex align-items-center gap-2">
+            <FaFileInvoiceDollar /> Generate Invoice
+          </Button>
+        </div> */}
+      </Card>
 
       {/* Footer */}
       <footer className="text-center text-muted mt-4 small">
         <hr />
         <div>
-          Role: <span className="fw-bold">Faculty</span> &nbsp;|&nbsp; &copy;{" "}
+          Role: <span className="fw-bold">Admin</span> &nbsp;|&nbsp; &copy;{" "}
           {new Date().getFullYear()} Rizvi College of Engineering
         </div>
       </footer>

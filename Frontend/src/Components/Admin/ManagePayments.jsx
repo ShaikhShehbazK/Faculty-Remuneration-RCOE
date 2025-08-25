@@ -1,5 +1,14 @@
 import { useState, useEffect } from "react";
-import { Container, Row, Col, Card, Table, Button, Offcanvas, Form } from "react-bootstrap";
+import {
+  Container,
+  Row,
+  Col,
+  Card,
+  Table,
+  Button,
+  Offcanvas,
+  Form,
+} from "react-bootstrap";
 import {
   FaEye,
   FaEdit,
@@ -10,9 +19,13 @@ import {
 } from "react-icons/fa";
 import AdminSidebar from "../AdminSidebar";
 import axios from "axios";
+import api from "../../utils/api";
 
 function ManagePayments() {
   const [showSidebar, setShowSidebar] = useState(false);
+  const handleSidebarOpen = () => setShowSidebar(true);
+  const handleSidebarClose = () => setShowSidebar(false);
+
   const [payments, setPayments] = useState([]);
   const [loading, setLoading] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
@@ -20,9 +33,6 @@ function ManagePayments() {
   const [filterSemester, setFilterSemester] = useState("");
   const [facultyList, setFacultyList] = useState([]);
   const [semesters] = useState([1, 2, 3, 4, 5, 6, 7, 8]);
-
-  const handleSidebarOpen = () => setShowSidebar(true);
-  const handleSidebarClose = () => setShowSidebar(false);
 
   // Fetch all payments on component mount
   useEffect(() => {
@@ -33,27 +43,119 @@ function ManagePayments() {
   // Fetch faculty list for filter dropdown
   const fetchFacultyList = async () => {
     try {
-      const response = await axios.get('http://localhost:3002/admin/faculty/getAll');
-      console.log('Fetched faculty list:', response.data);
+      const response = await api.get(
+        "http://localhost:3002/admin/faculty/getAll"
+      );
+      console.log("Fetched faculty list:", response.data);
       setFacultyList(response.data);
     } catch (error) {
-      console.error('Error fetching faculty list:', error);
+      console.error("Error fetching faculty list:", error);
     }
-  }; 
+  };
 
   // Fetch all payments from MongoDB
   const fetchPayments = async () => {
     try {
       setLoading(true);
-      const response = await axios.get('http://localhost:3002/admin/payment/getAll');
-      console.log('Fetched payments:', response.data);
+      const response = await axios.get(
+        "http://localhost:3002/admin/payment/getAll"
+      );
+      console.log("Fetched payments:", response.data);
       setPayments(response.data);
     } catch (error) {
-      console.error('Error fetching payments:', error);
-      alert('Failed to fetch payment records');
+      console.error("Error fetching payments:", error);
+      alert("Failed to fetch payment records");
     } finally {
       setLoading(false);
     }
+  };
+
+  const handleSlip = async ( paymentId, facultyName, academicYear, semesterType ) => {
+    console.log("Payment ID : ", paymentId);
+
+    try {
+      const url = `http://localhost:3002/payment/generate-pdf/${paymentId}`;
+
+      const response = await fetch(url, {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/pdf",
+        },
+      });
+
+      if (!response.ok) {
+        throw new Error("Failed to download slip");
+      }
+
+      // Convert to Blob
+      const blob = await response.blob();
+      const fileURL = window.URL.createObjectURL(blob);
+
+      // Create <a> link and trigger download
+      const link = document.createElement("a");
+      link.href = fileURL;
+      link.download = `PaymentSlip_${facultyName}_${academicYear}_${semesterType}.pdf`;
+      document.body.appendChild(link);
+      link.click();
+
+      // Cleanup
+      document.body.removeChild(link);
+      window.URL.revokeObjectURL(fileURL);
+    } catch (err) {
+      console.error("Error downloading slip:", err);
+    }
+
+    /* const safeName = facultyName.replace(/\s+/g, "_"); // replace spaces with _
+    const fileName = `Remuneration_Slip_${safeName}_${academicYear}_${semesterType}.pdf`;
+    try {
+      const response = await fetch(url, {
+        method: "GET",
+        headers: {
+          Accept: "application/pdf",
+        },
+      });
+
+      if (!response.ok) throw new Error("Failed to download slip");
+
+      const blob = await response.blob();
+      const blobUrl = window.URL.createObjectURL(blob);
+
+      const link = document.createElement("a");
+      link.href = blobUrl;
+      link.download = fileName;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+
+      window.URL.revokeObjectURL(blobUrl);
+    } catch (error) {
+      console.error("Error downloading slip:", error);
+    } */
+
+    /* try {
+      const response = await fetch(url, { method: "GET" });
+      const blob = await response.blob();
+      const blobUrl = window.URL.createObjectURL(blob);
+
+      const link = document.createElement("a");
+      link.href = blobUrl;
+      link.download = fileName;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+
+      // cleanup
+      window.URL.revokeObjectURL(blobUrl);
+    } catch (error) {
+      console.error("Error downloading slip:", error);
+    } */
+
+    /* const link = document.createElement("a");
+    link.href = url;
+    link.setAttribute("download", fileName);
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link); */
   };
 
   // Handle search and filtering
@@ -70,26 +172,29 @@ function ManagePayments() {
   // Format date for display
   const formatDate = (dateString) => {
     const date = new Date(dateString);
-    return date.toLocaleDateString('en-IN');
+    return date.toLocaleDateString("en-IN");
   };
 
- /*  // Get faculty name by ID
+  /*  // Get faculty name by ID
   const getFacultyName = (facultyId) => {
     const faculty = facultyList.find(f => f._id === facultyId);
     return faculty ? faculty.name : 'Unknown Faculty';
   }; */
 
   // Filter payments based on search and filters
-  const filteredPayments = payments.filter(payment => {
-    const facultyName = payment.facultyId.name.toLowerCase();
-    const matchesSearch = searchTerm === "" || 
+  const filteredPayments = payments.filter((payment) => {
+    const facultyName = payment.facultyName;
+    const matchesSearch =
+      searchTerm === "" ||
       facultyName.includes(searchTerm.toLowerCase()) ||
       payment.academicYear.toString().includes(searchTerm) ||
       payment.semester.toString().includes(searchTerm);
-    
-    const matchesFaculty = filterFaculty === "" || payment.facultyId === filterFaculty;
-    const matchesSemester = filterSemester === "" || payment.semester.toString() === filterSemester;
-    
+
+    const matchesFaculty =
+      filterFaculty === "" || payment.facultyId === filterFaculty;
+    const matchesSemester =
+      filterSemester === "" || payment.semester.toString() === filterSemester;
+
     return matchesSearch && matchesFaculty && matchesSemester;
   });
 
@@ -97,14 +202,23 @@ function ManagePayments() {
     <Container fluid className="p-4 bg-light min-vh-100">
       {/* Mobile Hamburger Header */}
       <div className="d-flex d-md-none align-items-center mb-3">
-        <Button variant="outline-primary" className="me-2" onClick={handleSidebarOpen}>
+        <Button
+          variant="outline-primary"
+          className="me-2"
+          onClick={handleSidebarOpen}
+        >
           <FaBars size={20} />
         </Button>
         <h5 className="mb-0 fw-bold">Manage Faculty Payments</h5>
       </div>
       <Row>
         {/* Sidebar: Offcanvas for mobile, static for desktop */}
-        <Offcanvas show={showSidebar} onHide={handleSidebarClose} className="d-md-none" backdrop>
+        <Offcanvas
+          show={showSidebar}
+          onHide={handleSidebarClose}
+          className="d-md-none"
+          backdrop
+        >
           <Offcanvas.Header closeButton>
             <Offcanvas.Title>Menu</Offcanvas.Title>
           </Offcanvas.Header>
@@ -135,8 +249,8 @@ function ManagePayments() {
           <Card className="mb-4 p-4 shadow rounded-4 border-0 bg-white">
             <div className="d-flex justify-content-between align-items-center mb-3">
               <h5 className="fw-bold mb-0">Search & Filter</h5>
-              <Button 
-                variant="outline-primary" 
+              <Button
+                variant="outline-primary"
                 size="sm"
                 onClick={fetchPayments}
                 disabled={loading}
@@ -145,7 +259,7 @@ function ManagePayments() {
                 Refresh
               </Button>
             </div>
-            
+
             <Row>
               <Col md={4} className="mb-3">
                 <Form.Group>
@@ -157,8 +271,8 @@ function ManagePayments() {
                       value={searchTerm}
                       onChange={(e) => setSearchTerm(e.target.value)}
                     />
-                    <Button 
-                      variant="outline-secondary" 
+                    <Button
+                      variant="outline-secondary"
                       onClick={handleSearch}
                       disabled={loading}
                     >
@@ -180,16 +294,16 @@ function ManagePayments() {
                     <option value="">All Faculty</option>
                     {facultyList.map((faculty) => (
                       <option key={faculty._id} value={faculty._id}>
-                        {faculty.name}
+                        {faculty.facultyName}
                       </option>
                     ))}
                   </Form.Select>
                 </Form.Group>
               </Col>
-              
+
               <Col md={2} className="mb-3 d-flex align-items-end">
-                <Button 
-                  variant="outline-secondary" 
+                <Button
+                  variant="outline-secondary"
                   onClick={() => {
                     setSearchTerm("");
                     setFilterFaculty("");
@@ -215,7 +329,7 @@ function ManagePayments() {
                 )}
               </div>
             </div>
-            
+
             {loading ? (
               <div className="text-center py-4">
                 <div className="spinner-border text-primary" role="status">
@@ -230,6 +344,7 @@ function ManagePayments() {
                     <th>Faculty Name</th>
                     {/* <th>Semester</th> */}
                     <th>Academic Year</th>
+                    <th>Semester Type</th>
                     <th>Payment Date</th>
                     <th>Total Amount</th>
                     <th>Status</th>
@@ -240,32 +355,39 @@ function ManagePayments() {
                   {filteredPayments.length === 0 ? (
                     <tr>
                       <td colSpan="7" className="text-center text-muted py-4">
-                        {payments.length === 0 ? 
-                          "No payment records found. Create payments using the Payments page." : 
-                          "No payments match your search criteria."
-                        }
+                        {payments.length === 0
+                          ? "No payment records found. Create payments using the Payments page."
+                          : "No payments match your search criteria."}
                       </td>
                     </tr>
                   ) : (
                     filteredPayments.map((payment, index) => (
                       <tr key={payment._id || index}>
-                        <td className="fw-bold">{payment.facultyId.name}</td>
+                        <td className="fw-bold">{payment.facultyName}</td>
                         {/* <td>
                           <span className="badge bg-info text-dark">
                             Semester {payment.semester}
                           </span>
                         </td> */}
                         <td>{payment.academicYear}</td>
-                        <td className="text-primary">{formatDate(payment.createdAt)}</td>
+                        <td>{payment.semesterType}</td>
+                        <td className="text-primary">
+                          {formatDate(payment.createdAt)}
+                        </td>
                         <td className="fw-bold text-success">
-                          ₹{payment.totalAmount?.toLocaleString() || '0'}
+                          ₹{payment.totalAmount?.toLocaleString() || "0"}
                         </td>
                         <td>
-                          <span className={`badge ${
-                            payment.status === 'paid' ? 'bg-success text-white' : 
-                            payment.status === 'unpaid' ? 'bg-warning text-dark' : 'bg-secondary'
-                          }`}>
-                            {payment.status?.toUpperCase() || 'UNDEFINED'}
+                          <span
+                            className={`badge ${
+                              payment.status === "paid"
+                                ? "bg-success text-white"
+                                : payment.status === "unpaid"
+                                ? "bg-warning text-dark"
+                                : "bg-secondary"
+                            }`}
+                          >
+                            {payment.status?.toUpperCase() || "UNDEFINED"}
                           </span>
                         </td>
                         <td>
@@ -289,6 +411,14 @@ function ManagePayments() {
                             variant="link"
                             className="p-0 ms-2 text-decoration-none"
                             size="sm"
+                            onClick={() =>
+                              handleSlip(
+                                payment._id,
+                                payment.facultyId.name,
+                                payment.academicYear,
+                                payment.semesterType
+                              )
+                            }
                           >
                             <FaFileInvoiceDollar className="me-1" /> Slip
                           </Button>

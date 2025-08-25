@@ -1,10 +1,7 @@
-import {
-  FaUser,
-  FaMoneyBillWave,
-  FaHistory,
-  FaSignOutAlt,
-} from "react-icons/fa";
+import { useEffect, useState } from "react";
+import { FaUser, FaMoneyBillWave, FaHistory, FaSignOutAlt } from "react-icons/fa";
 import { NavLink } from "react-router-dom";
+import axios from "axios";
 
 // Faculty Sidebar Component
 function FacultySidebar() {
@@ -26,12 +23,46 @@ function FacultySidebar() {
     },
   ];
 
+  const [facultyData, setFacultyData] = useState(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const facultyId = localStorage.getItem("facultyId");
+
+    if (!facultyId) {
+      console.error("No facultyId found in localStorage");
+      return;
+    }
+
+    const fetchFacultyData = async () => {
+      try {
+        const facultyRes = await axios.get(
+          `http://localhost:3002/admin/faculty/getSingle/${facultyId}`
+        );
+        console.log("Getting Faculty Details For dashboard");
+        console.log(facultyRes.data);
+        setFacultyData(facultyRes.data);
+      } catch (err) {
+        console.error("Error fetching faculty data:", err);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchFacultyData();
+  }, []);
+
+  if (loading) return <div className="p-4">Loading Dashboard...</div>;
+  if (!facultyData) return <div className="p-4">No faculty data found</div>;
+
+  const { name, designation } = facultyData
+
   return (
     <>
       <div className="text-center mb-4">
         <div className="position-relative d-inline-block mb-3">
           <img
-            src="/rcoe logo.jpg"
+            src="/rcoe-logo.jpg"
             alt="Profile"
             className="rounded-circle border border-3 border-primary"
             width="80"
@@ -43,8 +74,8 @@ function FacultySidebar() {
             style={{ width: "20px", height: "20px" }}
           ></div>
         </div>
-        <h6 className="fw-bold mb-0">Prof. Mohd Ashfaque</h6>
-        <small className="text-muted">Assistant Professor</small>
+        <h6 className="fw-bold mb-0">{name}</h6>
+        <small className="text-muted">{designation}</small>
         <div className="mt-2">
           <span className="badge bg-success">Online</span>
         </div>

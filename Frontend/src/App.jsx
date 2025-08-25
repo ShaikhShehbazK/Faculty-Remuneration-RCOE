@@ -22,6 +22,9 @@ import EditFaculty from "./Components/Admin/Faculty Manager/EditFaculty";
 import ResetPassword from "./Components/ForgotPassword/ResetPassword";
 import ForgotPassword from "./Components/ForgotPassword/ForgotPassword";
 import ProtectedRoute from "./Components/ProtectedRoute";
+import UpdateAssignment from "./Components/Admin/Faculty Manager/UpdateAssignment";
+
+
 
 function App() {
   return (
@@ -31,6 +34,7 @@ function App() {
 
         <Route element={<ProtectedRoute />}>
           {/* Admin Routes */}
+          {/* id = faculty Id */}
           <Route path="/admin/payments" element={<Payments />}></Route>
         
           <Route path="/admin/managepayments" element={<ManagePayments />}></Route>
@@ -39,24 +43,27 @@ function App() {
 
           <Route path="/admin/paymenthistory" element={<PaymentHistories />} ></Route>
 
-          <Route path="/admin/paymenthistory/details" element={<FacultyPaymentDetails />} ></Route>
+          <Route path="/admin/paymenthistory/details/:id/:academicYear/:semesterType" element={<FacultyPaymentDetails />} ></Route>
 
           <Route path="/admin/facultymanager" element={<FacultyManagement />} ></Route>
 
-          <Route path="/admin/facultymanager/details" element={<FacultyDetails />} ></Route>
+          <Route path="/admin/facultymanager/details/:id" element={<FacultyDetails />} ></Route>
 
-          <Route path="/admin/facultymanager/details/subject" element={<SubjectRemunerationDetails /> }></Route>
+          <Route path="/admin/facultymanager/details/:id/subject/:subjectId/:academicYear" element={<SubjectRemunerationDetails /> }></Route>
          
           <Route path="/admin/facultymanager/add" element={<AddFacultyForm /> }></Route>
 
           <Route path="/admin/facultymanager/edit/:id" element={<EditFaculty /> }></Route>
+
+          <Route path="/admin/facultymanager/update/:id" element={<UpdateAssignment /> }></Route>
+
 
           {/* Faculty Routes */}
           <Route path="/faculty/dashboard" element={ <FacultyDashboard /> }> </Route>
   
           <Route path="/faculty/payments" element={ <FacultyPayments /> }> </Route>
   
-          <Route path="/faculty/payments/subjectremu" element={ <SubjectRemuneration /> }> </Route>
+          <Route path="/faculty/payments/subjectremu/:subjectId/:academicYear" element={ <SubjectRemuneration /> }> </Route>
   
           <Route path="/faculty/payments/overall" element={ <OverallSlip /> }> </Route>
   

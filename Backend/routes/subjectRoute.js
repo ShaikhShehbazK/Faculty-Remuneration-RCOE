@@ -8,7 +8,7 @@ const { jwtAuthMiddleware } = require("../jwt");
 // ✅ GET all subjects (optionally filtered by semester or department)
 subjectRouter.get(
   "/getList",
-  jwtAuthMiddleware,
+   jwtAuthMiddleware,
   isAdmin,
   subjectController.getSubjects
 );

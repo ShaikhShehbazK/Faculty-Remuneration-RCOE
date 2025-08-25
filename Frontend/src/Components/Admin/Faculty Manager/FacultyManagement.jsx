@@ -30,7 +30,7 @@ function FacultyManagement() {
         setError('Failed to load faculty data. Please try again.');
         if (err.response?.status === 401) {
           alert('Authentication failed. Please login again.');
-          navigate('/login');
+          navigate('/');
         }
       } finally {
         setLoading(false);

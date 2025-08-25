@@ -1,104 +1,204 @@
-import React, { useState , useEffect } from 'react';
-import { Container, Form, Row, Col, Button, Alert, Card } from 'react-bootstrap';
-import { FaArrowLeft, FaUserPlus, FaUserTie, FaBookOpen, FaEnvelope, FaPhone } from 'react-icons/fa';
-import { useNavigate } from 'react-router-dom';
-import api from '../../../utils/api';
-import Select from 'react-select';
-import axios from 'axios';
+import React, { useState, useEffect } from "react";
+import { Container, Form, Row, Col, Button, Alert, Card, Badge } from "react-bootstrap";
+import { FaArrowLeft, FaUserPlus, FaUserTie, FaBookOpen, FaEnvelope, FaPhone, FaCalendarAlt, FaLayerGroup } from "react-icons/fa";
+import { useNavigate } from "react-router-dom";
+import api from "../../../utils/api";
+import Select from "react-select";
 
 function AddFacultyForm() {
   const navigate = useNavigate();
   const [formData, setFormData] = useState({
-    name: '',
-    department: '',
-    designation: '',
-    email: '',
-    password: '',
-    phone: '',
-    baseSalary: '', 
-    travelAllowance: '',
-    semester: '',
-    subject: '',
+    name: "",
+    department: "",
+    designation: "",
+    email: "",
+    password: "",
+    phone: "",
+    baseSalary: "",
+    travelAllowance: "",
+    academicYear: "",
+    semesterType: "",
+    semester: "",
+    subject: "",
   });
 
-  const [assignedSubjects, setAssignedSubjects] = useState([]); // [{ semester, subject }]
-
+  const [assignedSubjects, setAssignedSubjects] = useState([]);
   const [success, setSuccess] = useState(false);
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState('');
+  const [error, setError] = useState("");
 
   const [subjectOptions, setSubjectOptions] = useState([]);
 
-  const departments = ['Computer', 'Mechanical', 'Electrical', 'Civil', 'AIDS', 'ECS'];
-  const designations = ['Professor', 'Associate Professor', 'Assistant Professor', 'HoD', 'External Examiner'];
-  const semesters = [1, 2, 3, 4, 5, 6, 7, 8];
-  /* const subjects = ['Data Structures', 'Operating Systems', 'Algorithms', 'Calculus']; */
+  const departments = [ "Computer", "Mechanical", "Electrical", "Civil", "AIDS", "ECS" ];
+  const designations = [ "Professor", "Associate Professor", "Assistant Professor", "HoD", "External Examiner" ];
 
-  useEffect(() => {
-  const fetchSubjects = async () => {
-    console.log("Fetching subjects for semester:", formData.semester);
-    if (formData.semester && formData.semester !== 'Select') {
-      try {
-        //Sending token to backend for authentication 
-       /* const token = JSON.parse(localStorage.getItem("token"));
-        console.log(token);
-        const header = {
-          headers: {
-            Authorization: `Bearer ${token}`, //Passing the token in Authorization Header
-          },
-        };  */
-        const res = await api.get(`/faculty/subject/getList?semester=${formData.semester}`);
-        console.log(res.data);
-
-        const subjectNames = res.data.map((subj) => subj.name); // assuming Subject has a 'name'
-        setSubjectOptions(subjectNames);
-      } catch (err) {
-        console.error('Failed to fetch subjects:', err);
-        if (err.response?.status === 401) {
-          alert('Authentication failed. Please login again.');
-          navigate('/login');
-        }
-      }
-    } else {
-      setSubjectOptions([]); // clear when no semester selected
-    }
+  // ✅ Get semester options dynamically based on type
+  const getSemesterOptions = () => {
+    if (formData.semesterType === "Odd") return [1, 3, 5, 7];
+    if (formData.semesterType === "Even") return [2, 4, 6, 8];
+    return [];
   };
 
-  fetchSubjects();
-}, [formData.semester, navigate]);
-
+  // ✅ Fetch subjects dynamically based on semester
+  useEffect(() => {
+    const fetchSubjects = async () => {
+      if (formData.semester) {
+        try {
+          const res = await api.get(`/faculty/subject/getList?semester=${formData.semester}`);
+          const subjectNames = res.data.map((subj) => subj.name);
+          setSubjectOptions(subjectNames);
+        } catch (err) {
+          console.error("Failed to fetch subjects:", err);
+          if (err.response?.status === 401) {
+            alert("Authentication failed. Please login again.");
+            navigate("/login");
+          }
+        }
+      } else {
+        setSubjectOptions([]);
+      }
+    };
+    fetchSubjects();
+  }, [formData.semester, navigate]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setFormData(prev => ({ ...prev, [name]: value }));
+    setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
   const handleAddAssignment = (e) => {
-    e.preventDefault();
-    if (formData.semester && formData.subject && formData.semester !== 'Select' && formData.subject !== 'Select') {
-      // Prevent duplicate assignments
-      const exists = assignedSubjects.some(
-        (a) => a.semester === formData.semester && a.subject === formData.subject
-      );
-      if (!exists) {
-        setAssignedSubjects(prev => [...prev, { semester: formData.semester, subject: formData.subject }]);
-      }
-      // Clear subject selection field after adding
-      setFormData(prev => ({ ...prev, subject: '', semester: '' }));
+  e.preventDefault();
+  if (formData.semester && formData.subject) {
+    const exists = assignedSubjects.some(
+      (a) =>
+        a.academicYear === formData.academicYear &&
+        a.semesterType === formData.semesterType &&
+        a.semester === formData.semester &&
+        a.subject === formData.subject
+    );
+
+    if (!exists) {
+      setAssignedSubjects((prev) => [
+        ...prev,
+        {
+          academicYear: formData.academicYear,
+          semesterType: formData.semesterType,
+          semester: formData.semester,
+          subject: formData.subject,
+        },
+      ]);
     }
-  };
+
+    setFormData((prev) => ({ ...prev, subject: "", semester: "" }));
+  }
+};
+
+/*   const handleAddAssignment = (e) => {
+    e.preventDefault();
+    if (formData.semester && formData.subject) {
+      const exists = assignedSubjects.some((a) => a.semester === formData.semester && a.subject === formData.subject);
+
+      if (!exists) {
+        setAssignedSubjects((prev) => [
+          ...prev,
+          { semester: formData.semester, subject: formData.subject },
+        ]);
+      }
+      setFormData((prev) => ({ ...prev, subject: "", semester: "" }));
+    }
+  }; */
 
   const handleRemoveAssignment = (index) => {
-    setAssignedSubjects(prev => prev.filter((_, i) => i !== index));
+    setAssignedSubjects((prev) => prev.filter((_, i) => i !== index));
   };
 
   const handleSubmit = async (e) => {
+  e.preventDefault();
+  setLoading(true);
+  setError("");
+
+  try {
+    // Group by academicYear and semesterType
+    const academicAssignments = [];
+
+    assignedSubjects.forEach((a) => {
+      let yearGroup = academicAssignments.find(
+        (grp) => grp.academicYear === a.academicYear
+      );
+      if (!yearGroup) {
+        yearGroup = { academicYear: a.academicYear, semesters: [] };
+        academicAssignments.push(yearGroup);
+      }
+
+      let semGroup = yearGroup.semesters.find(
+        (s) => s.semesterType === a.semesterType
+      );
+      if (!semGroup) {
+        semGroup = { semesterType: a.semesterType, subjects: [] };
+        yearGroup.semesters.push(semGroup);
+      }
+
+      semGroup.subjects.push({
+        name: a.subject,
+        semester: Number(a.semester),
+      });
+    });
+
+    const facultyData = {
+      name: formData.name,
+      email: formData.email,
+      password: formData.password,
+      phone: formData.phone,
+      department: formData.department,
+      designation: formData.designation,
+      baseSalary: Number(formData.baseSalary),
+      travelAllowance: Number(formData.travelAllowance),
+      academicAssignments, // ✅ final nested structure
+    };
+
+    const response = await api.post("/admin/faculty/add", facultyData);
+    console.log("Faculty created successfully:", response.data);
+    setSuccess(true);
+
+    // reset
+    setFormData({
+      name: "",
+      department: "",
+      designation: "",
+      email: "",
+      password: "",
+      phone: "",
+      baseSalary: "",
+      travelAllowance: "",
+      academicYear: "",
+      semesterType: "",
+      semester: "",
+      subject: "",
+    });
+    setAssignedSubjects([]);
+    setTimeout(() => setSuccess(false), 5000);
+  } catch (err) {
+    console.error("Error creating faculty:", err);
+    if (err.response?.status === 401) {
+      alert("Authentication failed. Please login again.");
+      navigate("/login");
+    } else {
+      setError(
+        err.response?.data?.error ||
+          "Failed to create faculty. Please try again."
+      );
+    }
+  } finally {
+    setLoading(false);
+  }
+};
+
+  /* const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
-    setError('');
-    
+    setError("");
+
     try {
-      // Format the data according to backend expectations
       const facultyData = {
         name: formData.name,
         email: formData.email,
@@ -108,66 +208,76 @@ function AddFacultyForm() {
         designation: formData.designation,
         baseSalary: Number(formData.baseSalary),
         travelAllowance: Number(formData.travelAllowance),
-        subjects: assignedSubjects.map(subject => ({
+        academicYear: formData.academicYear,
+        semesterType: formData.semesterType,
+        subjects: assignedSubjects.map((subject) => ({
           name: subject.subject,
-          semester: Number(subject.semester)
-        }))
+          semester: Number(subject.semester),
+        })),
       };
 
-      const response = await api.post('/admin/faculty/add', facultyData);
-      
-      console.log('Faculty created successfully:', response.data);
+      const response = await api.post("/admin/faculty/add", facultyData);
+      console.log("Faculty created successfully:", response.data);
       setSuccess(true);
-      
-      // Reset form after successful submission
+
+      // reset
       setFormData({
-        name: '',
-        department: '',
-        designation: '',
-        email: '',
-        password: '',
-        phone: '',
-        baseSalary: '', 
-        travelAllowance: '',
-        semester: '',
-        subject: '',
+        name: "",
+        department: "",
+        designation: "",
+        email: "",
+        password: "",
+        phone: "",
+        baseSalary: "",
+        travelAllowance: "",
+        academicYear: "",
+        semesterType: "",
+        semester: "",
+        subject: "",
       });
       setAssignedSubjects([]);
-      
       setTimeout(() => setSuccess(false), 5000);
     } catch (err) {
-      console.error('Error creating faculty:', err);
+      console.error("Error creating faculty:", err);
       if (err.response?.status === 401) {
-        alert('Authentication failed. Please login again.');
-        navigate('/login');
+        alert("Authentication failed. Please login again.");
+        navigate("/login");
       } else {
-        setError(err.response?.data?.error || 'Failed to create faculty. Please try again.');
+        setError(
+          err.response?.data?.error ||
+            "Failed to create faculty. Please try again."
+        );
       }
     } finally {
       setLoading(false);
     }
-  };
+  }; */
 
   const handleGoBack = () => {
-    navigate('/admin/facultymanager');
+    navigate("/admin/facultymanager");
   };
 
   return (
     <Container fluid className="p-4 bg-light min-vh-100">
-
-      {/* Header (Back Button + Heading) */}
+      {/* Header */}
       <div className="d-flex align-items-center gap-3 mb-4">
-        <Button variant="outline-secondary" className="d-flex align-items-center gap-2" onClick={handleGoBack}>
+        <Button
+          variant="outline-secondary"
+          className="d-flex align-items-center gap-2"
+          onClick={handleGoBack}
+        >
           <FaArrowLeft /> Back
         </Button>
         <h2 className="fw-bold mb-0">Add Faculty Member</h2>
       </div>
 
-      {/* Card that contains Form */}
-      <Card className="shadow rounded-4 border-0 p-4 bg-white mx-auto" style={{ maxWidth: 900 }}>
+      <Card
+        className="shadow rounded-4 border-0 p-4 bg-white mx-auto"
+        style={{ maxWidth: 900 }}
+      >
         <Form onSubmit={handleSubmit}>
           <Row>
-            {/* First Part Of Form i.e Faculty Details */}
+            {/* Faculty Details */}
             <Col md={6}>
               <div className="d-flex align-items-center gap-2 mb-3">
                 <FaUserTie className="text-primary" />
@@ -175,14 +285,35 @@ function AddFacultyForm() {
               </div>
               <Form.Group className="mb-3">
                 <Form.Label>Name</Form.Label>
-                <Form.Control name="name" value={formData.name} onChange={handleChange} placeholder="Enter faculty name" required/>
+                <Form.Control
+                  name="name"
+                  value={formData.name}
+                  onChange={handleChange}
+                  placeholder="Enter faculty name"
+                  required
+                />
               </Form.Group>
               <Form.Group className="mb-3">
                 <Form.Label>Department</Form.Label>
                 <Select
-                  options={departments.map(dep => ({ value: dep, label: dep }))}
-                  value={formData.department ? { value: formData.department, label: formData.department } : null}
-                  onChange={selected => setFormData(prev => ({ ...prev, department: selected ? selected.value : '' }))}
+                  options={departments.map((dep) => ({
+                    value: dep,
+                    label: dep,
+                  }))}
+                  value={
+                    formData.department
+                      ? {
+                          value: formData.department,
+                          label: formData.department,
+                        }
+                      : null
+                  }
+                  onChange={(selected) =>
+                    setFormData((prev) => ({
+                      ...prev,
+                      department: selected ? selected.value : "",
+                    }))
+                  }
                   placeholder="Select Department"
                   required
                 />
@@ -190,64 +321,196 @@ function AddFacultyForm() {
               <Form.Group className="mb-3">
                 <Form.Label>Designation</Form.Label>
                 <Select
-                  options={designations.map(des => ({ value: des, label: des }))}
-                  value={formData.designation ? { value: formData.designation, label: formData.designation } : null}
-                  onChange={selected => setFormData(prev => ({ ...prev, designation: selected ? selected.value : '' }))}
+                  options={designations.map((des) => ({
+                    value: des,
+                    label: des,
+                  }))}
+                  value={
+                    formData.designation
+                      ? {
+                          value: formData.designation,
+                          label: formData.designation,
+                        }
+                      : null
+                  }
+                  onChange={(selected) =>
+                    setFormData((prev) => ({
+                      ...prev,
+                      designation: selected ? selected.value : "",
+                    }))
+                  }
                   placeholder="Select Designation"
                   required
                 />
               </Form.Group>
 
-              {/* Remuneration Details Section */}
+              {/* Remuneration */}
               <div className="d-flex align-items-center gap-2 mb-3 mt-4">
                 <FaUserPlus className="text-success" />
                 <h5 className="fw-bold mb-0">Remuneration Details</h5>
               </div>
               <Form.Group className="mb-3">
                 <Form.Label>Base Salary</Form.Label>
-                <Form.Control name="baseSalary" value={formData.baseSalary} onChange={handleChange} placeholder="Enter base salary" type="number" min="0" required/>
+                <Form.Control
+                  name="baseSalary"
+                  value={formData.baseSalary}
+                  onChange={handleChange}
+                  type="number"
+                  min="0"
+                  placeholder="Enter Base Salary"
+                  required
+                />
               </Form.Group>
               <Form.Group className="mb-3">
                 <Form.Label>Travel Allowance</Form.Label>
-                <Form.Control name="travelAllowance" value={formData.travelAllowance} onChange={handleChange} placeholder="Enter travel allowance" type="number" min="0" required/>
+                <Form.Control
+                  name="travelAllowance"
+                  value={formData.travelAllowance}
+                  onChange={handleChange}
+                  type="number"
+                  min="0"
+                  placeholder="Enter Travel Allowance"
+                  required
+                />
               </Form.Group>
             </Col>
 
-            {/* Second Part Of Form i.e Contact & Assignment + Subject Assignment */}
+            {/* Contact + Assignments */}
             <Col md={6}>
               <div className="d-flex align-items-center gap-2 mb-3 mt-4 mt-md-0">
                 <FaEnvelope className="text-primary" />
-                <h5 className="fw-bold mb-0">Contact & Assignment</h5>
+                <h5 className="fw-bold mb-0">Contact Details</h5>
               </div>
               <Form.Group className="mb-3">
                 <Form.Label>Email</Form.Label>
-                <Form.Control name="email" value={formData.email} onChange={handleChange} placeholder="Enter email address" required/>
+                <Form.Control
+                  name="email"
+                  value={formData.email}
+                  onChange={handleChange}
+                  placeholder="Enter email"
+                  required
+                />
               </Form.Group>
               <Form.Group className="mb-3">
                 <Form.Label>Password</Form.Label>
-                <Form.Control name="password" value={formData.password} onChange={handleChange} placeholder="Enter password" required/>
+                <Form.Control
+                  name="password"
+                  value={formData.password}
+                  onChange={handleChange}
+                  placeholder="Enter password"
+                  required
+                />
               </Form.Group>
               <Form.Group className="mb-3">
-                <Form.Label>Phone Number</Form.Label>
-                <Form.Control name="phone" value={formData.phone} onChange={handleChange} placeholder="Enter phone number" required/>
+                <Form.Label>Phone</Form.Label>
+                <Form.Control
+                  name="phone"
+                  value={formData.phone}
+                  onChange={handleChange}
+                  placeholder="Enter contact number"
+                  required
+                />
               </Form.Group>
 
-              {/* Subject Assignment Section - moved here for better balance */}
+              {/* ✅ Academic Year + Semester Type */}
               <Card className="shadow-sm rounded-3 border-0 p-3 mt-4 bg-light">
-                <div className="d-flex align-items-center gap-2 mb-2">
-                  <FaBookOpen className="text-primary" />
-                  <h5 className="fw-bold mb-0">Subject Assignments</h5>
-                </div>
+                <Row>
+                  <div className="d-flex align-items-center gap-2 mb-3 mt-4 mt-md-0">
+                    <FaBookOpen className="text-primary" />
+                    <h5 className="fw-bold mb-0">Subject Assignments</h5>
+                  </div>
+
+                  <Col xs={6}>
+                    <Form.Group className="mb-3">
+                      <Form.Label>
+                        <FaCalendarAlt className="me-1 text-secondary" />{" "}
+                        Academic Year
+                      </Form.Label>
+                      <Form.Select
+                        value={formData.academicYear}
+                        onChange={(e) => {
+                          const start = e.target.value;
+                          const end = (parseInt(start) + 1)
+                            .toString()
+                            .slice(-2);
+                          setFormData({
+                            ...formData,
+                            academicYear: `${start}-${end}`,
+                          });
+                        }}
+                      >
+                        <option value="">Select Year</option>
+                        {Array.from({ length: 6 }, (_, i) => 2023 + i).map(
+                          (year) => (
+                            <option key={year} value={year}>
+                              {year}
+                            </option>
+                          )
+                        )}
+                      </Form.Select>
+
+                      {/* ✅ Academic Year Preview Badge */}
+                      {formData.academicYear && (
+                        <div className="mt-2">
+                          <Badge bg="info">
+                            Academic Year: {formData.academicYear}
+                          </Badge>
+                        </div>
+                      )}
+                    </Form.Group>
+                  </Col>
+
+                  <Col xs={6}>
+                    <Form.Group className="mb-3">
+                      <Form.Label>
+                        <FaLayerGroup className="me-1 text-secondary" />{" "}
+                        Semester Type
+                      </Form.Label>
+                      <Form.Select
+                        value={formData.semesterType}
+                        onChange={(e) =>
+                          setFormData({
+                            ...formData,
+                            semesterType: e.target.value,
+                            semester: "",
+                          })
+                        }
+                        required
+                      >
+                        <option value="">Select Type</option>
+                        <option value="Odd">Odd</option>
+                        <option value="Even">Even</option>
+                      </Form.Select>
+                    </Form.Group>
+                  </Col>
+                </Row>
+
+                {/* Subject Assignment */}
                 <Row>
                   <Col xs={6}>
                     <Form.Group className="mb-3">
                       <Form.Label>Semester</Form.Label>
                       <Select
-                        options={semesters.map(sem => ({ value: sem, label: `Semester ${sem}` }))}
-                        value={formData.semester ? { value: formData.semester, label: `Semester ${formData.semester}` } : null}
-                        onChange={selected => setFormData(prev => ({ ...prev, semester: selected ? selected.value : '' }))}
+                        options={getSemesterOptions().map((sem) => ({
+                          value: sem,
+                          label: `Semester ${sem}`,
+                        }))}
+                        value={
+                          formData.semester
+                            ? {
+                                value: formData.semester,
+                                label: `Semester ${formData.semester}`,
+                              }
+                            : null
+                        }
+                        onChange={(selected) =>
+                          setFormData((prev) => ({
+                            ...prev,
+                            semester: selected ? selected.value : "",
+                          }))
+                        }
                         placeholder="Select Semester"
-                        required
+                        isDisabled={!formData.semesterType}
                       />
                     </Form.Group>
                   </Col>
@@ -255,30 +518,56 @@ function AddFacultyForm() {
                     <Form.Group className="mb-3">
                       <Form.Label>Subjects</Form.Label>
                       <Select
-                        options={subjectOptions.map(sub => ({ value: sub, label: sub }))}
-                        value={formData.subject ? { value: formData.subject, label: formData.subject } : null}
-                        onChange={selected => setFormData(prev => ({ ...prev, subject: selected ? selected.value : '' }))}
+                        options={subjectOptions.map((sub) => ({
+                          value: sub,
+                          label: sub,
+                        }))}
+                        value={
+                          formData.subject
+                            ? {
+                                value: formData.subject,
+                                label: formData.subject,
+                              }
+                            : null
+                        }
+                        onChange={(selected) =>
+                          setFormData((prev) => ({
+                            ...prev,
+                            subject: selected ? selected.value : "",
+                          }))
+                        }
                         placeholder="Select Subject"
-                        required
+                        isDisabled={!formData.semester}
                       />
                     </Form.Group>
                   </Col>
                 </Row>
-                <div className="mb-3">
-                  <Button variant="outline-primary" className="fw-bold px-3 py-1 rounded-pill" onClick={handleAddAssignment} disabled={!(formData.semester && formData.subject && formData.semester !== 'Select' && formData.subject !== 'Select')}>
-                    Add Assignment
-                  </Button>
-                </div>
+                <Button
+                  variant="outline-primary"
+                  className="fw-bold px-3 py-1 rounded-pill"
+                  onClick={handleAddAssignment}
+                  disabled={!(formData.semester && formData.subject)}
+                >
+                  Add Assignment
+                </Button>
 
-                {/* Assigned Subjects List */}
                 {assignedSubjects.length > 0 && (
-                  <div className="mb-2">
+                  <div className="mt-3">
                     <h6 className="fw-bold">Assigned Subjects:</h6>
                     <ul className="list-group">
                       {assignedSubjects.map((a, idx) => (
-                        <li key={idx} className="list-group-item d-flex justify-content-between align-items-center">
-                          <span>{a.semester} - {a.subject}</span>
-                          <Button variant="danger" size="sm" onClick={() => handleRemoveAssignment(idx)}>
+                        <li
+                          key={idx}
+                          className="list-group-item d-flex justify-content-between align-items-center"
+                        >
+                          <span>
+                            Semester {a.semester} - {a.subject}
+                          </span>
+                          <Button
+                            variant="danger"
+                            size="sm"
+                            onClick={() => handleRemoveAssignment(idx)}
+                          >
                             Remove
                           </Button>
                         </li>
@@ -290,18 +579,20 @@ function AddFacultyForm() {
             </Col>
           </Row>
 
+          {/* Submit */}
           <div className="text-end mt-3">
-            <Button 
-              type="submit" 
-              variant="primary" 
+            <Button
+              type="submit"
+              variant="primary"
               className="fw-bold px-4 py-2 d-flex align-items-center gap-2 rounded-pill"
               disabled={loading}
             >
               {loading ? (
                 <>
-                  <div className="spinner-border spinner-border-sm" role="status">
-                    <span className="visually-hidden">Loading...</span>
-                  </div>
+                  <div
+                    className="spinner-border spinner-border-sm"
+                    role="status"
+                  ></div>
                   Creating...
                 </>
               ) : (
@@ -317,18 +608,15 @@ function AddFacultyForm() {
               <strong>Error:</strong> {error}
             </Alert>
           )}
-
           {success && (
             <Alert variant="success" className="mt-4 rounded-3 shadow-sm">
-              Faculty member <strong>{formData.name}</strong> added successfully. <a href="#" className="fw-bold text-primary text-decoration-underline">View Profile</a>
+              Faculty member added successfully!
             </Alert>
           )}
-          
         </Form>
       </Card>
-
     </Container>
   );
-};
+}
 
 export default AddFacultyForm;

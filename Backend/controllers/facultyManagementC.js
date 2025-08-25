@@ -2,11 +2,80 @@ const Faculty = require("../models/faculty");
 const Subject = require("../models/subjects");
 const bcrypt = require("bcryptjs");
 
+// POST /admin/faculty/add
 exports.addFaculty = async (req, res) => {
   try {
-    const subjectsInput = req.body.subjects;
+    const academicAssignments = req.body.academicAssignments;
 
+    // mapping nested structure properly to fetch subject id from mongoDb
     const assignedSubjects = await Promise.all(
+      academicAssignments.map(async (yearBlock) => {
+        const semesters = await Promise.all(
+          yearBlock.semesters.map(async (semBlock) => {
+            const subjects = await Promise.all(
+              semBlock.subjects.map(async (subj) => {
+                const subjectDoc = await Subject.findOne({
+                  name: subj.name,
+                  semester: subj.semester,
+                });
+
+                if (!subjectDoc) {
+                  throw new Error(
+                    `Subject not found: ${subj.name} (Semester ${subj.semester})`
+                  );
+                }
+
+                return {
+                  subjectId: subjectDoc._id,
+                  name: subj.name,
+                  semester: subj.semester,
+                };
+              })
+            );
+
+            return {
+              semesterType: semBlock.semesterType,
+              subjects,
+            };
+          })
+        );
+
+        return {
+          academicYear: yearBlock.academicYear,
+          semesters,
+        };
+      })
+    );
+
+    const hashedPassword = await bcrypt.hash(req.body.password, 12);
+
+    const faculty = new Faculty({
+      name: req.body.name,
+      email: req.body.email,
+      password: hashedPassword,
+      phone: req.body.phone,
+      department: req.body.department,
+      role: req.body.role || "faculty",
+      baseSalary: req.body.baseSalary,
+      travelAllowance: req.body.travelAllowance,
+      designation: req.body.designation,
+      assignedSubjects, // ✅ now matches schema
+    });
+
+    await faculty.save();
+    res.status(201).json(faculty);
+  } catch (err) {
+    res
+      .status(400)
+      .json({ error: "Faculty creation failed", details: err.message });
+  }
+};
+
+/* exports.addFaculty = async (req, res) => {
+  try {
+    const subjectsInput = req.body.academicAssignments;
+
+    const mappedSubjects = await Promise.all(
       subjectsInput.map(async (subj) => {
         const subjectDoc = await Subject.findOne({
           name: subj.name,
@@ -31,7 +100,17 @@ exports.addFaculty = async (req, res) => {
       baseSalary: req.body.baseSalary,
       travelAllowance: req.body.travelAllowance,
       designation: req.body.designation,
-      assignedSubjects,
+      assignedSubjects: [
+        {
+          academicYear,
+          semesters: [
+            {
+              semesterType,
+              subjects: mappedSubjects,
+            },
+          ],
+        },
+      ],
     });
     await faculty.save();
     res.status(201).json(faculty);
@@ -40,13 +119,155 @@ exports.addFaculty = async (req, res) => {
       .status(400)
       .json({ error: "Faculty creation failed", details: err.message });
   }
+}; */
+
+// PUT /admin/faculty/:id/update
+exports.updateAssignments = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { academicYear, semesterType, subjects } = req.body;
+
+    const faculty = await Faculty.findById(id);
+    if (!faculty) return res.status(404).json({ error: "Faculty not found" });
+
+    // ✅ Resolve subjectId from DB using name + semester
+    const resolvedSubjects = await Promise.all(
+      subjects.map(async (subj) => {
+        console.log("🔍 Searching subject:", subj, "Semester:", subj.semester);
+        const found = await Subject.findOne({
+          name: subj.name,
+          semester: subj.semester,
+        });
+
+        if (!found) {
+          return res.status(400).json({
+            error: `Subject not found: ${subj.name} (Semester ${subj.semester})`,
+          });
+        }
+
+        return {
+          subjectId: found._id,
+          name: found.name,
+          semester: found.semester,
+        };
+      })
+    );
+
+    // ✅ Now update assignments with resolved subjectIds
+    let yearBlock = faculty.assignedSubjects.find(
+      (a) => a.academicYear === academicYear
+    );
+
+    if (yearBlock) {
+      let semBlock = yearBlock.semesters.find(
+        (s) => s.semesterType === semesterType
+      );
+      if (semBlock) {
+        semBlock.subjects.push(...resolvedSubjects); // same year+sem → add subjects
+      } else {
+        yearBlock.semesters.push({ semesterType, subjects: resolvedSubjects }); // same year, new sem
+      }
+    } else {
+      faculty.assignedSubjects.push({
+        academicYear,
+        semesters: [{ semesterType, subjects: resolvedSubjects }],
+      }); // new year
+    }
+
+    await faculty.save();
+    res.status(200).json({ message: "Assignments updated", faculty });
+  } catch (err) {
+    console.error("Error updating assignments:", err.message);
+    res.status(500).json({ error: "Server error", details: err.message });
+  }
 };
 
+/* exports.updateAssignments = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { academicYear, semesterType, subjects } = req.body;
+
+    const faculty = await Faculty.findById(id);
+    if (!faculty) return res.status(404).json({ error: "Faculty not found" });
+
+    let yearBlock = faculty.assignedSubjects.find(a => a.academicYear === academicYear);
+
+    if (yearBlock) {
+      let semBlock = yearBlock.semesters.find(s => s.semesterType === semesterType);
+      if (semBlock) {
+        semBlock.subjects.push(...subjects); // same year+sem → add subjects
+      } else {
+        yearBlock.semesters.push({ semesterType, subjects }); // same year, new sem
+      }
+    } else {
+      faculty.assignedSubjects.push({ academicYear, semesters: [{ semesterType, subjects }] }); // new year
+    }
+
+    await faculty.save();
+    res.status(200).json({ message: "Assignments updated", faculty });
+  } catch (err) {
+    res.status(500).json({ error: "Server error", details: err.message });
+  }
+}; */
+
+// PUT /admin/faculty/:id/remove-subject
+exports.removeSubject = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { subjectId, semester, academicYear } = req.body;
+
+    const faculty = await Faculty.findById(id);
+    if (!faculty) return res.status(404).json({ error: "Faculty not found" });
+
+    // find year block
+    let yearBlock = faculty.assignedSubjects.find(
+      (a) => a.academicYear === academicYear
+    );
+    if (!yearBlock) {
+      return res.status(400).json({ error: "No assignments found for this year" });
+    }
+
+    // find semester block
+    let semBlock = yearBlock.semesters.find(
+      (s) => s.subjects.some((sub) => String(sub.subjectId) === String(subjectId))
+    );
+    if (!semBlock) {
+      return res.status(400).json({ error: "No such subject found in this year/semester" });
+    }
+
+    // remove subject
+    semBlock.subjects = semBlock.subjects.filter(
+      (sub) => String(sub.subjectId) !== String(subjectId)
+    );
+
+    // clean up empty semesters
+    if (semBlock.subjects.length === 0) {
+      yearBlock.semesters = yearBlock.semesters.filter(
+        (s) => s !== semBlock
+      );
+    }
+
+    // clean up empty year blocks
+    if (yearBlock.semesters.length === 0) {
+      faculty.assignedSubjects = faculty.assignedSubjects.filter(
+        (a) => a !== yearBlock
+      );
+    }
+
+    await faculty.save();
+    res.status(200).json({ message: "Subject removed successfully", faculty });
+  } catch (err) {
+    console.error("Error removing subject:", err.message);
+    res.status(500).json({ error: "Server error", details: err.message });
+  }
+};
+
+
+// GET /admin/faculty/getAll
 exports.getAllFaculties = async (req, res) => {
   try {
-    const faculties = await Faculty.find().populate(
-      "assignedSubjects.subjectId"
-    );
+    const faculties =
+      await Faculty.find(); /* .populate("assignedSubjects.subjectId"); */
     res.json(faculties);
   } catch (err) {
     res.status(500).json({ error: "Failed to get faculties" });
@@ -55,9 +276,9 @@ exports.getAllFaculties = async (req, res) => {
 
 exports.getSingleFaculty = async (req, res) => {
   try {
-    const faculty = await Faculty.findById(req.params.id).populate(
-      "assignedSubjects.subjectId"
-    );
+    const faculty = await Faculty.findById(
+      req.params.id
+    ); /* .populate("assignedSubjects.subjectId"); */
     if (!faculty) return res.status(404).json({ error: "Faculty not found" });
     res.json(faculty);
   } catch (err) {
@@ -75,7 +296,7 @@ exports.editFaculty = async (req, res) => {
     }
 
     // Handle subjects if provided
-    if (updateData.subjects) {
+    /* if (updateData.subjects) {
       const assignedSubjects = await Promise.all(
         updateData.subjects.map(async (subj) => {
           const subjectDoc = await Subject.findOne({
@@ -91,7 +312,7 @@ exports.editFaculty = async (req, res) => {
       );
       updateData.assignedSubjects = assignedSubjects;
     }
-
+ */
     const faculty = await Faculty.findByIdAndUpdate(req.params.id, updateData, {
       new: true,
     }).populate("assignedSubjects.subjectId");
