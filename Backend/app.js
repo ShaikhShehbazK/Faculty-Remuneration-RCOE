@@ -17,6 +17,7 @@ const paymentRouter = require("./routes/paymentRoute");
 const generatePDF = require("./routes/genereate-pdf");
 const forgetPasswordRouter = require("./routes/forgetPasswordRoute");
 const changePasswordRouter = require("./routes/changePasswordRoute");
+const checkRoleRoute = require("./routes/checkRole");
 
 const app = express();
 
@@ -39,6 +40,7 @@ app.use(bodyParser.urlencoded({ extended: true }));
 
 const MONGO_DB_URL = process.env.MONGO_URI;
 
+app.use("/", checkRoleRoute);
 app.use("/faculty", facultyAuthRoute);
 app.use("/admin", adminAuthRoute);
 app.use("/faculty/subject", subjectRouter);
