@@ -3,7 +3,11 @@ const mongoose = require("mongoose");
 
 const paymentSchema = new mongoose.Schema(
   {
-    facultyId: { type: mongoose.Schema.Types.ObjectId, ref: "Faculty", required: true },
+    facultyId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Faculty",
+      required: true,
+    },
     facultyName: { type: String }, // ✅ ADDed this
 
     academicYear: { type: String, required: true }, // e.g. "2025-26"
@@ -21,28 +25,33 @@ const paymentSchema = new mongoose.Schema(
           applicable: { type: Boolean, default: false },
           count: { type: Number, default: 0 },
           rate: { type: Number, default: 0 },
-          amount: { type: Number, default: 0 }
+          amount: { type: Number, default: 0 },
         },
         oralPracticalAssessment: {
           applicable: { type: Boolean, default: false },
           count: { type: Number, default: 0 },
           rate: { type: Number, default: 0 },
-          amount: { type: Number, default: 0 }
+          amount: { type: Number, default: 0 },
         },
         paperChecking: {
           applicable: { type: Boolean, default: false },
           count: { type: Number, default: 0 },
           rate: { type: Number, default: 0 },
-          amount: { type: Number, default: 0 }
+          amount: { type: Number, default: 0 },
         },
-        subjectTotal: { type: Number, default: 0 }
+        subjectTotal: { type: Number, default: 0 },
       },
     ],
 
     totalRemuneration: { type: Number, default: 0 }, // Total remuneration of all selected subjects
     totalAmount: { type: Number, default: 0 }, // baseSalary + TA + totalRemuneration
 
-    status: { type: String, enum: ["paid", "unpaid"], default: "unpaid" },
+    status: {
+      type: String,
+      enum: ["paid", "unpaid", "failed"],
+      default: "unpaid",
+    },
+    transactionId: String, // store mock/real payment gateway ID
     paidDate: Date,
   },
   { timestamps: true }

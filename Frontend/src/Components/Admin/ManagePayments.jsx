@@ -20,6 +20,7 @@ import {
 import AdminSidebar from "../AdminSidebar";
 import axios from "axios";
 import api from "../../utils/api";
+import toast from "react-hot-toast";
 
 function ManagePayments() {
   const [showSidebar, setShowSidebar] = useState(false);
@@ -33,6 +34,31 @@ function ManagePayments() {
   const [filterSemester, setFilterSemester] = useState("");
   const [facultyList, setFacultyList] = useState([]);
   const [semesters] = useState([1, 2, 3, 4, 5, 6, 7, 8]);
+
+  const handlePay = async (paymentId) => {
+    console.log(paymentId);
+    try {
+      const token = localStorage.getItem("token");
+      if (!token) {
+        return;
+      }
+      console.log(token);
+
+      const response = await axios.post(
+        `http://localhost:3002/make-payment/${paymentId}`,
+        {},
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        }
+      );
+      console.log(response.data);
+      toast.success("Payment marked as paid!");
+      fetchPayments(); // refresh table
+    } catch (error) {
+      console.error("Error marking payment as paid:", error);
+      toast.error("Failed to mark payment as paid.");
+    }
+  };
 
   // Fetch all payments on component mount
   useEffect(() => {
@@ -64,13 +90,18 @@ function ManagePayments() {
       setPayments(response.data);
     } catch (error) {
       console.error("Error fetching payments:", error);
-      alert("Failed to fetch payment records");
+      toast.error("Failed to fetch payment records");
     } finally {
       setLoading(false);
     }
   };
 
-  const handleSlip = async ( paymentId, facultyName, academicYear, semesterType ) => {
+  const handleSlip = async (
+    paymentId,
+    facultyName,
+    academicYear,
+    semesterType
+  ) => {
     console.log("Payment ID : ", paymentId);
 
     try {
@@ -82,9 +113,17 @@ function ManagePayments() {
           "Content-Type": "application/pdf",
         },
       });
-
+      console.log("Checking area", response);
+      // if (!response.ok) {
+      //   throw new Error("Failed to download slip");
+      // }
       if (!response.ok) {
-        throw new Error("Failed to download slip");
+        const errorData = await response.json().catch(() => ({}));
+        const errorMessage =
+          errorData.message || "Failed to generate slip. Try again later.";
+        // alert(errorMessage);
+        toast.error(errorMessage); // "Slip can only be generated after payment is successful"
+        throw new Error(errorMessage);
       }
 
       // Convert to Blob
@@ -391,37 +430,59 @@ function ManagePayments() {
                           </span>
                         </td>
                         <td>
-                          <Button
-                            variant="link"
-                            className="p-0 me-2 text-decoration-none"
-                            size="sm"
-                          >
-                            <FaEye className="me-1" /> View
-                          </Button>
-                          <span className="text-muted">|</span>
-                          <Button
-                            variant="link"
-                            className="p-0 mx-2 text-decoration-none"
-                            size="sm"
-                          >
-                            <FaEdit className="me-1" /> Edit
-                          </Button>
-                          <span className="text-muted">|</span>
-                          <Button
-                            variant="link"
-                            className="p-0 ms-2 text-decoration-none"
-                            size="sm"
-                            onClick={() =>
-                              handleSlip(
-                                payment._id,
-                                payment.facultyId.name,
-                                payment.academicYear,
-                                payment.semesterType
-                              )
-                            }
-                          >
-                            <FaFileInvoiceDollar className="me-1" /> Slip
-                          </Button>
+                          <div className="d-flex flex-wrap align-items-center gap-2">
+                            <Button
+                              variant="outline-primary"
+                              className="d-flex align-items-center px-2 py-1"
+                              size="sm"
+                              title="View Payment Details"
+                            >
+                              <FaEye className="me-1" /> <span>View</span>
+                            </Button>
+                            <Button
+                              variant="outline-secondary"
+                              className="d-flex align-items-center px-2 py-1"
+                              size="sm"
+                              title="Edit Payment"
+                              // onClick={() => handleEditpayment(payment._id)}
+                            >
+                              <FaEdit className="me-1" /> <span>Edit</span>
+                            </Button>
+                            <Button
+                              variant="outline-success"
+                              className="d-flex align-items-center px-2 py-1"
+                              size="sm"
+                              title="Mark as Paid"
+                              onClick={() => handlePay(payment._id)}
+                              disabled={payment.status === "paid"}
+                            >
+                              <span
+                                role="img"
+                                aria-label="Pay"
+                                className="me-1"
+                              >
+                                💰
+                              </span>
+                              <span>Pay</span>
+                            </Button>
+                            <Button
+                              variant="outline-info"
+                              className="d-flex align-items-center px-2 py-1"
+                              size="sm"
+                              title="Download Remuneration Slip"
+                              onClick={() =>
+                                handleSlip(
+                                  payment._id,
+                                  payment.facultyId.name,
+                                  payment.academicYear,
+                                  payment.semesterType
+                                )
+                              }
+                            >
+                              <FaFileInvoiceDollar className="me-1" />{" "}
+                              <span>Slip</span>
+                            </Button>
+                          </div>
                         </td>
                       </tr>
                     ))

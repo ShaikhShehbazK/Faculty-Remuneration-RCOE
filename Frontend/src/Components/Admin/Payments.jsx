@@ -1,5 +1,15 @@
 import { useState, useEffect } from "react";
-import { Form, Button, Table, Row, Col, Container, Card, InputGroup, Offcanvas } from "react-bootstrap";
+import {
+  Form,
+  Button,
+  Table,
+  Row,
+  Col,
+  Container,
+  Card,
+  InputGroup,
+  Offcanvas,
+} from "react-bootstrap";
 import { FaSave, FaSyncAlt, FaFileInvoiceDollar, FaBars } from "react-icons/fa";
 import AdminSidebar from "../AdminSidebar";
 import axios from "axios";
@@ -92,7 +102,7 @@ function Payments() {
     const sem = semesterObj.semester;
     const academicYear = semesterObj.academicYear;
     const semesterType = semesterObj.semesterType;
-    console.log("sem ", sem , "Year ", academicYear, "Type ", semesterType);
+    console.log("sem ", sem, "Year ", academicYear, "Type ", semesterType);
 
     setSubjects([]);
 
@@ -174,7 +184,9 @@ function Payments() {
     try {
       setLoading(true);
       // Find the selected subject object to get its ID
-      const selectedSubjectObj = subjects.find((subject) => subject.name === selectedSubject);
+      const selectedSubjectObj = subjects.find(
+        (subject) => subject.name === selectedSubject
+      );
       if (!selectedSubjectObj) {
         alert("Selected subject not found");
         return;
@@ -212,7 +224,12 @@ function Payments() {
         totalPayment: totalPayment,
       };
 
-      console.log( "Adding remuneration for subject:", selectedSubject, "with ID:", selectedSubjectObj.subjectId );
+      console.log(
+        "Adding remuneration for subject:",
+        selectedSubject,
+        "with ID:",
+        selectedSubjectObj.subjectId
+      );
 
       setCalculatedRemunerations((prev) => [...prev, calculatedRemuneration]);
 
@@ -225,7 +242,9 @@ function Payments() {
       setSemesterPapers("");
       setSemesterRate("");
 
-      alert('Subject added to calculation. Click "Update Final Calculation" to save to database.');
+      alert(
+        'Subject added to calculation. Click "Update Final Calculation" to save to database.'
+      );
     } catch (error) {
       console.error("Error adding subject to calculation:", error);
       alert("Failed to add subject to calculation. Please try again.");
@@ -237,7 +256,9 @@ function Payments() {
   // Handle final calculation and save to database
   const handleUpdateFinalCalculation = async () => {
     if (calculatedRemunerations.length === 0) {
-      alert("Please add at least one subject remuneration before final calculation");
+      alert(
+        "Please add at least one subject remuneration before final calculation"
+      );
       return;
     }
 
@@ -254,7 +275,9 @@ function Payments() {
         .map((remuneration) => {
           // Use the stored subjectId directly if available
           if (remuneration.subjectId) {
-            console.log(`Using stored subjectId: ${remuneration.subjectId} for subject: ${remuneration.subjectName}`);
+            console.log(
+              `Using stored subjectId: ${remuneration.subjectId} for subject: ${remuneration.subjectName}`
+            );
             return {
               subjectId: remuneration.subjectId,
               subjectName: remuneration.subjectName, // ADDed
@@ -275,7 +298,9 @@ function Payments() {
           }
 
           // Fallback: Try to find by name if subjectId is not available
-          let subjectObj = subjects.find((subject) => subject.name === remuneration.subjectName);
+          let subjectObj = subjects.find(
+            (subject) => subject.name === remuneration.subjectName
+          );
 
           // If not found, try case-insensitive match
           if (!subjectObj) {
@@ -301,11 +326,16 @@ function Payments() {
 
           if (!subjectObj) {
             console.error("Subject not found for:", remuneration.subjectName);
-            console.log("Available subjects:", subjects.map((s) => s.name));
+            console.log(
+              "Available subjects:",
+              subjects.map((s) => s.name)
+            );
             return null;
           }
 
-          console.log(`Matched "${remuneration.subjectName}" with "${subjectObj.name} SubjectObj: ${subjectObj}"`);
+          console.log(
+            `Matched "${remuneration.subjectName}" with "${subjectObj.name} SubjectObj: ${subjectObj}"`
+          );
 
           return {
             subjectId: subjectObj.subjectId,
@@ -332,7 +362,10 @@ function Payments() {
       );
 
       console.log("All calculated remunerations:", calculatedRemunerations);
-      console.log( "Available subjects:", subjects.map((s) => ({ name: s.name, subjectId: s.subjectId })));
+      console.log(
+        "Available subjects:",
+        subjects.map((s) => ({ name: s.name, subjectId: s.subjectId }))
+      );
       console.log("Subject breakdown being sent:", uniqueSubjectBreakdown);
 
       // Validate that we have subjects to send
@@ -344,8 +377,8 @@ function Payments() {
       const semesterObj = JSON.parse(selectedSemester);
       const paymentData = {
         facultyId: selectedFaculty,
-        academicYear: semesterObj.academicYear,   // ✅ send Year
-        semesterType: semesterObj.semesterType,   // ✅ send Odd/Even
+        academicYear: semesterObj.academicYear, // ✅ send Year
+        semesterType: semesterObj.semesterType, // ✅ send Odd/Even
         /* baseSalary,
         travelAllowance, */
         subjectBreakdown: uniqueSubjectBreakdown,
@@ -361,7 +394,10 @@ function Payments() {
       }; */
 
       console.log("Sending final payment data:", paymentData);
-      const response = await axios.post("http://localhost:3002/admin/payment/create",paymentData);
+      const response = await axios.post(
+        "http://localhost:3002/admin/payment/create",
+        paymentData
+      );
       console.log("Final calculation response:", response.data);
 
       if (response.data) {
@@ -510,11 +546,17 @@ function Payments() {
                 <Form.Group>
                   <Form.Label>Subjects Assigned</Form.Label>
                   <div className="d-flex flex-wrap gap-2 p-2 border rounded">
-                    {getSubjectsDisplay().split(", ").map((subject, index) => (
-                      <div key={index} className="card p-2 shadow-sm" style={{ minWidth: "120px" }}>
-                        {subject}
-                      </div>
-                    ))}
+                    {getSubjectsDisplay()
+                      .split(", ")
+                      .map((subject, index) => (
+                        <div
+                          key={index}
+                          className="card p-2 shadow-sm"
+                          style={{ minWidth: "120px" }}
+                        >
+                          {subject}
+                        </div>
+                      ))}
                   </div>
                 </Form.Group>
               </Col>
@@ -778,7 +820,7 @@ function Payments() {
                       <td>{remuneration.subjectName}</td>
                       <td>
                         <span className="badge bg-info text-dark">
-                         {remuneration.semesterLabel}
+                          {remuneration.semesterLabel}
                         </span>
                       </td>
                       {calculatedRemunerations.some(
@@ -829,7 +871,7 @@ function Payments() {
                           )}
                         </td>
                       )}
-                      
+
                       <td className="fw-bold text-success">
                         ₹{remuneration.totalPayment.toLocaleString()}
                       </td>
@@ -893,7 +935,9 @@ function Payments() {
                     ₹
                     {(
                       calculatedRemunerations.reduce(
-                        (sum, item) => sum + item.totalPayment, 0) +
+                        (sum, item) => sum + item.totalPayment,
+                        0
+                      ) +
                       (facultyData ? facultyData.baseSalary || 0 : 0) +
                       (facultyData ? facultyData.travelAllowance || 0 : 0)
                     ).toLocaleString()}

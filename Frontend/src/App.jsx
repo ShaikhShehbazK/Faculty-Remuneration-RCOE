@@ -25,6 +25,7 @@ import ProtectedRoute from "./Components/UserProtectedRoute";
 import UpdateAssignment from "./Components/Admin/Faculty Manager/UpdateAssignment";
 import Logout from "./Components/Logout";
 import Unauthorized from "./Components/UnAuthorized";
+import { Toaster } from "react-hot-toast";
 
 function App() {
   return (
@@ -119,6 +120,7 @@ function App() {
         {/* Unauthorized page */}
         <Route path="/unauthorized" element={<Unauthorized />} />
       </Routes>
+      <Toaster />
     </>
   );
 }

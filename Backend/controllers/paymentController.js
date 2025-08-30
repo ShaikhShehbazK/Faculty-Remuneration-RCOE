@@ -6,17 +6,17 @@ const Payment = require("../models/payment");
 exports.getAllPayments = async (req, res) => {
   try {
     const payments = await Payment.find({})
-      .populate('facultyId', 'name email department designation')
+      .populate("facultyId", "name email department designation")
       .sort({ createdAt: -1 }); // Most recent first
 
     res.json(payments);
   } catch (error) {
-    console.error('Error fetching payments:', error);
-    res.status(500).json({ error: 'Failed to fetch payment data' });
+    console.error("Error fetching payments:", error);
+    res.status(500).json({ error: "Failed to fetch payment data" });
   }
 };
 
-// Fetching Single Payment 
+// Fetching Single Payment
 // **For For all academic years of a faculty**
 // GET /admin/payment/getSinglePayment/:facultyId
 // **For all subjects/semTypes of a faculty in a year**
@@ -43,7 +43,7 @@ exports.getSinglePayment = async (req, res) => {
     // Flatten all docs into one breakdown
     let breakdown = payments.flatMap((p) =>
       p.subjectBreakdown.map((item) => ({
-        paymentId: p._id,  // <- attached paymentId here
+        paymentId: p._id, // <- attached paymentId here
         subjectId: item.subjectId?._id?.toString?.() || item.subjectId,
         semester: item.subjectId?.semester ?? item.semester,
         subjectName: item.subjectId?.name ?? item.subjectName,
@@ -60,7 +60,9 @@ exports.getSinglePayment = async (req, res) => {
     if (subjectId) {
       breakdown = breakdown.filter((b) => b.subjectId === subjectId);
       if (breakdown.length === 0) {
-        return res.status(404).json({ message: "Subject not found in payment" });
+        return res
+          .status(404)
+          .json({ message: "Subject not found in payment" });
       }
     }
 
@@ -79,7 +81,7 @@ exports.getSinglePayment = async (req, res) => {
       error: err.message,
     });
   }
-}; 
+};
 
 /* ORIGINAL
 exports.getSinglePayment = async (req, res) => {
@@ -144,11 +146,14 @@ exports.getSinglePayment = async (req, res) => {
 // Get all faculty members
 exports.getAllFaculty = async (req, res) => {
   try {
-    const faculty = await Faculty.find({}, 'name email department designation baseSalary travelAllowance assignedSubjects');
+    const faculty = await Faculty.find(
+      {},
+      "name email department designation baseSalary travelAllowance assignedSubjects"
+    );
     res.json(faculty);
   } catch (error) {
-    console.error('Error fetching faculty:', error);
-    res.status(500).json({ error: 'Failed to fetch faculty data' });
+    console.error("Error fetching faculty:", error);
+    res.status(500).json({ error: "Failed to fetch faculty data" });
   }
 };
 
@@ -157,17 +162,17 @@ exports.getAllFaculty = async (req, res) => {
 exports.getFacultyById = async (req, res) => {
   try {
     const { facultyId } = req.params;
-    const faculty = await Faculty.findById(facultyId)
-      /* .populate('assignedSubjects.subjectId', 'name semester department'); */
+    const faculty = await Faculty.findById(facultyId);
+    /* .populate('assignedSubjects.subjectId', 'name semester department'); */
 
     if (!faculty) {
-      return res.status(404).json({ error: 'Faculty not found' });
+      return res.status(404).json({ error: "Faculty not found" });
     }
 
     res.json(faculty);
   } catch (error) {
-    console.error('Error fetching faculty:', error);
-    res.status(500).json({ error: 'Failed to fetch faculty data' });
+    console.error("Error fetching faculty:", error);
+    res.status(500).json({ error: "Failed to fetch faculty data" });
   }
 };
 
@@ -261,7 +266,9 @@ exports.getFacultySubjectsBySemester = async (req, res) => {
       (y) => y.academicYear === academicYear
     );
     if (!yearBlock) {
-      return res.status(404).json({ error: "No subjects for this academic year" });
+      return res
+        .status(404)
+        .json({ error: "No subjects for this academic year" });
     }
 
     // find semester type block
@@ -269,7 +276,9 @@ exports.getFacultySubjectsBySemester = async (req, res) => {
       (s) => s.semesterType === semesterType
     );
     if (!semBlock) {
-      return res.status(404).json({ error: "No subjects for this semester type" });
+      return res
+        .status(404)
+        .json({ error: "No subjects for this semester type" });
     }
 
     // filter subjects for given semester
@@ -334,7 +343,12 @@ exports.postCreate = async (req, res) => {
         subjectName: subjectItem.subjectName || subject.name,
         semester: subjectItem.semester || subject.semester,
         termTestAssessment: { applicable: false, count: 0, rate: 0, amount: 0 },
-        oralPracticalAssessment: { applicable: false, count: 0, rate: 0, amount: 0 },
+        oralPracticalAssessment: {
+          applicable: false,
+          count: 0,
+          rate: 0,
+          amount: 0,
+        },
         paperChecking: { applicable: false, count: 0, rate: 0, amount: 0 },
         subjectTotal: 0,
       };
@@ -349,9 +363,15 @@ exports.postCreate = async (req, res) => {
 
       // 💠 Oral/Practical
       if (subject.hasPractical) {
-        const { count = 0, rate = 0 } = subjectItem.oralPracticalAssessment || {};
+        const { count = 0, rate = 0 } =
+          subjectItem.oralPracticalAssessment || {};
         const amount = count * rate;
-        updated.oralPracticalAssessment = { applicable: true, count, rate, amount };
+        updated.oralPracticalAssessment = {
+          applicable: true,
+          count,
+          rate,
+          amount,
+        };
         subjectTotal += amount;
       }
 
@@ -369,17 +389,26 @@ exports.postCreate = async (req, res) => {
     }
 
     // 3. Check if a payment record already exists for same faculty/year/semType
-    let payment = await Payment.findOne({ facultyId, academicYear, semesterType });
+    let payment = await Payment.findOne({
+      facultyId,
+      academicYear,
+      semesterType,
+    });
 
     if (payment) {
       // ✅ Append new subjects to subjectBreakdown
       payment.subjectBreakdown.push(...updatedSubjectBreakdown);
 
       // Recalculate totals
-      payment.totalRemuneration =
-        payment.subjectBreakdown.reduce((sum, s) => sum + (s.subjectTotal || 0), 0);
+      payment.totalRemuneration = payment.subjectBreakdown.reduce(
+        (sum, s) => sum + (s.subjectTotal || 0),
+        0
+      );
 
-      payment.totalAmount = payment.baseSalary + payment.travelAllowance + payment.totalRemuneration;
+      payment.totalAmount =
+        payment.baseSalary +
+        payment.travelAllowance +
+        payment.totalRemuneration;
 
       await payment.save();
       return res.status(200).json({ message: "Payment updated", payment });
@@ -407,3 +436,100 @@ exports.postCreate = async (req, res) => {
   }
 };
 
+// controllers/paymentController.js
+
+exports.putUpdate = async (req, res) => {
+  try {
+    const { paymentId } = req.params;
+    const {
+      baseSalary,
+      travelAllowance,
+      subjectBreakdown, // updated subjects with counts & rates
+    } = req.body;
+
+    // 1. Find payment record
+    let payment = await Payment.findById(paymentId).populate("facultyId");
+    if (!payment) return res.status(404).json({ error: "Payment not found" });
+
+    // 2. Update base salary & allowance
+    payment.baseSalary = baseSalary ?? payment.baseSalary;
+    payment.travelAllowance = travelAllowance ?? payment.travelAllowance;
+
+    let totalRemuneration = 0;
+    const updatedSubjectBreakdown = [];
+
+    // 3. Process subject breakdown again
+    for (const subjectItem of subjectBreakdown) {
+      const subject = await Subject.findById(subjectItem.subjectId);
+      if (!subject) continue;
+
+      let subjectTotal = 0;
+      const updated = {
+        subjectId: subject._id,
+        subjectName: subjectItem.subjectName || subject.name,
+        semester: subjectItem.semester || subject.semester,
+        termTestAssessment: { applicable: false, count: 0, rate: 0, amount: 0 },
+        oralPracticalAssessment: {
+          applicable: false,
+          count: 0,
+          rate: 0,
+          amount: 0,
+        },
+        paperChecking: { applicable: false, count: 0, rate: 0, amount: 0 },
+        subjectTotal: 0,
+      };
+
+      // Term Test
+      if (subject.hasTermTest) {
+        const { count = 0, rate = 0 } = subjectItem.termTestAssessment || {};
+        const amount = count * rate;
+        updated.termTestAssessment = { applicable: true, count, rate, amount };
+        subjectTotal += amount;
+      }
+
+      // Oral/Practical
+      if (subject.hasPractical) {
+        const { count = 0, rate = 0 } =
+          subjectItem.oralPracticalAssessment || {};
+        const amount = count * rate;
+        updated.oralPracticalAssessment = {
+          applicable: true,
+          count,
+          rate,
+          amount,
+        };
+        subjectTotal += amount;
+      }
+
+      // Paper Checking
+      if (subject.hasSemesterExam) {
+        const { count = 0, rate = 0 } = subjectItem.paperChecking || {};
+        const amount = count * rate;
+        updated.paperChecking = { applicable: true, count, rate, amount };
+        subjectTotal += amount;
+      }
+
+      updated.subjectTotal = subjectTotal;
+      updatedSubjectBreakdown.push(updated);
+      totalRemuneration += subjectTotal;
+    }
+
+    // 4. Replace old breakdown with updated
+    payment.subjectBreakdown = updatedSubjectBreakdown;
+
+    // 5. Recalculate totals
+    payment.totalRemuneration = totalRemuneration;
+    payment.totalAmount =
+      payment.baseSalary + payment.travelAllowance + totalRemuneration;
+
+    await payment.save();
+
+    return res.status(200).json({
+      message: "Payment updated successfully",
+      payment,
+    });
+  } catch (error) {
+    console.error("Error updating payment:", error);
+    res.status(500).json({ error: "Server Error" });
+  }
+};

@@ -15,7 +15,12 @@ exports.getPDF = async (req, res) => {
       .populate("subjectBreakdown.subjectId");
 
     if (!payment) return res.status(404).send("Payment not found");
-
+    // ❌ Block slip generation if not paid
+    if (payment.status !== "paid") {
+      return res.status(400).json({
+        message: "Slip can only be generated after payment is successful",
+      });
+    }
     const doc = new PDFDocument({ size: "A4", margin: 40 });
     const safeName = payment.facultyId.name.replace(/\s+/g, "_");
     const fileName = `Remuneration_Slip_${safeName}_${payment.semesterType}_${payment.academicYear}.pdf`;
@@ -552,7 +557,6 @@ exports.getPDF = async (req, res) => {
 };
  */
 
-
 // URL : /payment/generate-pdf/:facultyId/:academicYear
 exports.getYearPDF = async (req, res) => {
   try {
@@ -565,6 +569,13 @@ exports.getYearPDF = async (req, res) => {
 
     if (!payments || payments.length === 0) {
       return res.status(404).send("Payments not found for this faculty/year");
+    }
+
+    // ❌ Block slip generation if not paid
+    if (payments.status !== "paid") {
+      return res.status(400).json({
+        message: "Slip can only be generated after payment is successful",
+      });
     }
 
     // Separate Odd & Even
@@ -624,25 +635,58 @@ exports.getYearPDF = async (req, res) => {
       .rect(40, y - 8, 530, 90)
       .fillAndStroke("#eaf6fb", "#b2bec3")
       .fillColor("black");
-    doc.font("Helvetica-Bold").fillColor("#2c3e50").text("Faculty Name:", leftX, y);
-    doc.font("Helvetica").fillColor("black").text(faculty.name, leftX + 110, y);
+    doc
+      .font("Helvetica-Bold")
+      .fillColor("#2c3e50")
+      .text("Faculty Name:", leftX, y);
+    doc
+      .font("Helvetica")
+      .fillColor("black")
+      .text(faculty.name, leftX + 110, y);
 
-    doc.font("Helvetica-Bold").fillColor("#2c3e50").text("Academic Year:", rightX, y);
-    doc.font("Helvetica").fillColor("black").text(academicYear, rightX + 120, y);
+    doc
+      .font("Helvetica-Bold")
+      .fillColor("#2c3e50")
+      .text("Academic Year:", rightX, y);
+    doc
+      .font("Helvetica")
+      .fillColor("black")
+      .text(academicYear, rightX + 120, y);
     y += spacing;
 
-    doc.font("Helvetica-Bold").fillColor("#2c3e50").text("Department:", leftX, y);
-    doc.font("Helvetica").fillColor("black").text(faculty.department, leftX + 110, y);
+    doc
+      .font("Helvetica-Bold")
+      .fillColor("#2c3e50")
+      .text("Department:", leftX, y);
+    doc
+      .font("Helvetica")
+      .fillColor("black")
+      .text(faculty.department, leftX + 110, y);
 
-    doc.font("Helvetica-Bold").fillColor("#2c3e50").text("Designation:", rightX, y);
-    doc.font("Helvetica").fillColor("black").text(faculty.designation || "Faculty", rightX + 120, y);
+    doc
+      .font("Helvetica-Bold")
+      .fillColor("#2c3e50")
+      .text("Designation:", rightX, y);
+    doc
+      .font("Helvetica")
+      .fillColor("black")
+      .text(faculty.designation || "Faculty", rightX + 120, y);
     y += spacing;
 
     doc.font("Helvetica-Bold").fillColor("#2c3e50").text("Email:", leftX, y);
-    doc.font("Helvetica").fillColor("black").text(faculty.email, leftX + 110, y);
+    doc
+      .font("Helvetica")
+      .fillColor("black")
+      .text(faculty.email, leftX + 110, y);
 
-    doc.font("Helvetica-Bold").fillColor("#2c3e50").text("Generated Date:", rightX, y);
-    doc.font("Helvetica").fillColor("black").text(moment().format("DD-MM-YYYY"), rightX + 120, y);
+    doc
+      .font("Helvetica-Bold")
+      .fillColor("#2c3e50")
+      .text("Generated Date:", rightX, y);
+    doc
+      .font("Helvetica")
+      .fillColor("black")
+      .text(moment().format("DD-MM-YYYY"), rightX + 120, y);
 
     doc.moveDown(1.5);
 
@@ -651,14 +695,19 @@ exports.getYearPDF = async (req, res) => {
       const tableLeftX = 50;
       const colWidths = { no: 40, subject: 230, semester: 100, amount: 100 };
       const tableWidth =
-        colWidths.no + colWidths.subject + colWidths.semester + colWidths.amount;
+        colWidths.no +
+        colWidths.subject +
+        colWidths.semester +
+        colWidths.amount;
 
       // Section Heading
       const headingY = doc.y + 10;
       const headingHeight = 26;
       const headingWidth = 200;
 
-      doc.rect(tableLeftX, headingY, headingWidth, headingHeight).fill("#117864");
+      doc
+        .rect(tableLeftX, headingY, headingWidth, headingHeight)
+        .fill("#117864");
       doc
         .font("Helvetica-Bold")
         .fontSize(13)
@@ -671,25 +720,40 @@ exports.getYearPDF = async (req, res) => {
       const headerY = doc.y;
       const headerHeight = 28;
 
-      doc.rect(tableLeftX, headerY, tableWidth, headerHeight).fillAndStroke("#d1f2eb", "#b2bec3");
+      doc
+        .rect(tableLeftX, headerY, tableWidth, headerHeight)
+        .fillAndStroke("#d1f2eb", "#b2bec3");
 
       doc
         .font("Helvetica-Bold")
         .fontSize(12)
         .fillColor("#117864")
-        .text("No.", tableLeftX, headerY + 8, { width: colWidths.no, align: "center" })
+        .text("No.", tableLeftX, headerY + 8, {
+          width: colWidths.no,
+          align: "center",
+        })
         .text("Subject", tableLeftX + colWidths.no, headerY + 8, {
           width: colWidths.subject,
           align: "center",
         })
-        .text("Semester", tableLeftX + colWidths.no + colWidths.subject, headerY + 8, {
-          width: colWidths.semester,
-          align: "center",
-        })
-        .text("Amount (Rs.)", tableLeftX + colWidths.no + colWidths.subject + colWidths.semester, headerY + 8, {
-          width: colWidths.amount - 5,
-          align: "right",
-        });
+        .text(
+          "Semester",
+          tableLeftX + colWidths.no + colWidths.subject,
+          headerY + 8,
+          {
+            width: colWidths.semester,
+            align: "center",
+          }
+        )
+        .text(
+          "Amount (Rs.)",
+          tableLeftX + colWidths.no + colWidths.subject + colWidths.semester,
+          headerY + 8,
+          {
+            width: colWidths.amount - 5,
+            align: "right",
+          }
+        );
 
       let yTable = headerY + headerHeight;
       let total = 0;
@@ -700,7 +764,9 @@ exports.getYearPDF = async (req, res) => {
         const subjectSem = entry.semester;
         total += subjectAmount;
 
-        const subjectHeight = doc.heightOfString(subjectName, { width: colWidths.subject - 10 });
+        const subjectHeight = doc.heightOfString(subjectName, {
+          width: colWidths.subject - 10,
+        });
         const rowHeight = Math.max(28, subjectHeight + 12);
 
         if (yTable + rowHeight > doc.page.height - 120) {
@@ -709,9 +775,13 @@ exports.getYearPDF = async (req, res) => {
         }
 
         if (index % 2 === 0) {
-          doc.rect(tableLeftX, yTable, tableWidth, rowHeight).fillAndStroke("#f8f9f9", "#b2bec3");
+          doc
+            .rect(tableLeftX, yTable, tableWidth, rowHeight)
+            .fillAndStroke("#f8f9f9", "#b2bec3");
         } else {
-          doc.rect(tableLeftX, yTable, tableWidth, rowHeight).fillAndStroke("#ffffff", "#b2bec3");
+          doc
+            .rect(tableLeftX, yTable, tableWidth, rowHeight)
+            .fillAndStroke("#ffffff", "#b2bec3");
         }
 
         const textY = yTable + (rowHeight - 12) / 2;
@@ -720,16 +790,31 @@ exports.getYearPDF = async (req, res) => {
           .font("Helvetica")
           .fontSize(11)
           .fillColor("black")
-          .text(index + 1, tableLeftX, textY, { width: colWidths.no, align: "center" })
-          .text(subjectName, tableLeftX + colWidths.no + 5, textY, { width: colWidths.subject - 10 })
-          .text(subjectSem.toString(), tableLeftX + colWidths.no + colWidths.subject, textY, {
-            width: colWidths.semester,
+          .text(index + 1, tableLeftX, textY, {
+            width: colWidths.no,
             align: "center",
           })
-          .text(`Rs. ${subjectAmount.toFixed(2)}`, tableLeftX + colWidths.no + colWidths.subject + colWidths.semester, textY, {
-            width: colWidths.amount - 10,
-            align: "right",
-          });
+          .text(subjectName, tableLeftX + colWidths.no + 5, textY, {
+            width: colWidths.subject - 10,
+          })
+          .text(
+            subjectSem.toString(),
+            tableLeftX + colWidths.no + colWidths.subject,
+            textY,
+            {
+              width: colWidths.semester,
+              align: "center",
+            }
+          )
+          .text(
+            `Rs. ${subjectAmount.toFixed(2)}`,
+            tableLeftX + colWidths.no + colWidths.subject + colWidths.semester,
+            textY,
+            {
+              width: colWidths.amount - 10,
+              align: "right",
+            }
+          );
 
         yTable += rowHeight;
       });
@@ -740,7 +825,9 @@ exports.getYearPDF = async (req, res) => {
         yTable = 50;
       }
 
-      doc.rect(tableLeftX, yTable, tableWidth, totalRowHeight).fillAndStroke("#e8f8f5", "#117864");
+      doc
+        .rect(tableLeftX, yTable, tableWidth, totalRowHeight)
+        .fillAndStroke("#e8f8f5", "#117864");
 
       doc
         .font("Helvetica-Bold")
@@ -750,30 +837,47 @@ exports.getYearPDF = async (req, res) => {
           width: colWidths.subject + colWidths.semester,
           align: "right",
         })
-        .text(`Rs. ${total.toFixed(2)}`, tableLeftX + colWidths.no + colWidths.subject + colWidths.semester, yTable + 8, {
-          width: colWidths.amount - 10,
-          align: "right",
-        });
+        .text(
+          `Rs. ${total.toFixed(2)}`,
+          tableLeftX + colWidths.no + colWidths.subject + colWidths.semester,
+          yTable + 8,
+          {
+            width: colWidths.amount - 10,
+            align: "right",
+          }
+        );
 
       doc.moveDown(2);
       return total;
     };
 
-    const oddTotal = oddPayment ? drawTable("Odd Semester Subjects", oddPayment.subjectBreakdown) : 0;
-    const evenTotal = evenPayment ? drawTable("Even Semester Subjects", evenPayment.subjectBreakdown) : 0;
+    const oddTotal = oddPayment
+      ? drawTable("Odd Semester Subjects", oddPayment.subjectBreakdown)
+      : 0;
+    const evenTotal = evenPayment
+      ? drawTable("Even Semester Subjects", evenPayment.subjectBreakdown)
+      : 0;
 
     // Salary Totals
-    const totalBase = (oddPayment?.baseSalary || 0) + (evenPayment?.baseSalary || 0);
-    const totalTravel = (oddPayment?.travelAllowance || 0) + (evenPayment?.travelAllowance || 0);
-    const totalRem = (oddPayment?.totalRemuneration || 0) + (evenPayment?.totalRemuneration || 0);
-    const totalAmt = (oddPayment?.totalAmount || 0) + (evenPayment?.totalAmount || 0);
+    const totalBase =
+      (oddPayment?.baseSalary || 0) + (evenPayment?.baseSalary || 0);
+    const totalTravel =
+      (oddPayment?.travelAllowance || 0) + (evenPayment?.travelAllowance || 0);
+    const totalRem =
+      (oddPayment?.totalRemuneration || 0) +
+      (evenPayment?.totalRemuneration || 0);
+    const totalAmt =
+      (oddPayment?.totalAmount || 0) + (evenPayment?.totalAmount || 0);
 
     if (doc.y > doc.page.height - 150) {
       doc.addPage();
     }
 
     const salaryBoxY = doc.y;
-    doc.rect(50, salaryBoxY, 500, 60).fillAndStroke("#fef9e7", "#f7ca18").fillColor("black");
+    doc
+      .rect(50, salaryBoxY, 500, 60)
+      .fillAndStroke("#fef9e7", "#f7ca18")
+      .fillColor("black");
     doc
       .font("Helvetica-Bold")
       .fontSize(12)
@@ -798,7 +902,10 @@ exports.getYearPDF = async (req, res) => {
     doc.moveDown(2);
 
     const boxY = doc.y;
-    doc.rect(50, boxY, 500, 36).fillAndStroke("#d4efdf", "#229954").fillColor("black");
+    doc
+      .rect(50, boxY, 500, 36)
+      .fillAndStroke("#d4efdf", "#229954")
+      .fillColor("black");
     doc
       .font("Helvetica-Bold")
       .fontSize(14)
@@ -806,7 +913,10 @@ exports.getYearPDF = async (req, res) => {
       .text("Total :", 60, boxY + 10)
       .font("Helvetica-Bold")
       .fillColor("#145a32")
-      .text(`Rs. ${totalAmt.toFixed(2)}`, 400, boxY + 10, { width: 130, align: "right" });
+      .text(`Rs. ${totalAmt.toFixed(2)}`, 400, boxY + 10, {
+        width: 130,
+        align: "right",
+      });
 
     const amountWords = toWords(totalAmt).toUpperCase();
     doc
@@ -829,11 +939,19 @@ exports.getYearPDF = async (req, res) => {
       .fillColor("black")
       .text("NEFT/UPI", 150, doc.y - 15);
 
-    doc.font("Helvetica-Bold").fontSize(11).fillColor("#7d6608").text("For Principal", 0, doc.y - 15, { align: "right" });
+    doc
+      .font("Helvetica-Bold")
+      .fontSize(11)
+      .fillColor("#7d6608")
+      .text("For Principal", 0, doc.y - 15, { align: "right" });
 
-    doc.moveDown(1.5).fontSize(9).fillColor("#616a6b").text("Note: This is a system-generated slip. Signature not required.", {
-      align: "center",
-    });
+    doc
+      .moveDown(1.5)
+      .fontSize(9)
+      .fillColor("#616a6b")
+      .text("Note: This is a system-generated slip. Signature not required.", {
+        align: "center",
+      });
 
     // ========= REMOVE EXTRA BLANK PAGE BEFORE PAGE NUMBERS =========
     let range = doc.bufferedPageRange();
@@ -865,4 +983,3 @@ exports.getYearPDF = async (req, res) => {
     res.status(500).send("Error generating yearly PDF.");
   }
 };
-
