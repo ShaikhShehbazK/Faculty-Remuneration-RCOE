@@ -500,7 +500,6 @@ function FacultyDetails() {
                                 variant="outline-success"
                                 size="sm"
                                 onClick={() => {
-                                  
                                   if (id) {
                                     window.open(
                                       `http://localhost:3002/payment/generate-pdf/${id}/${year}`,

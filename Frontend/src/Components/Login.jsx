@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
+import toast from "react-hot-toast";
 
 function Login() {
   const [loginRole, setLoginRole] = useState("faculty");
@@ -40,12 +41,12 @@ function Login() {
           payload
         );
         if (response.data.token) {
-          alert("Admin Login Successful ✅");
+          toast.success("Admin Login Successful ✅");
           localStorage.setItem("token", response.data.token);
           setFormData({ username: "", password: "", adminId: "" });
           navigate("/admin/payments");
         } else {
-          alert("Unexpected response from server");
+          toast.error("Unexpected response from server");
         }
       } else {
         const response = await axios.post(
@@ -54,7 +55,8 @@ function Login() {
         );
 
         if (response.data.token) {
-          alert("Faculty Login Successful ✅");
+          // alert("Faculty Login Successful ✅");
+          toast.success("Faculty Login Successful ✅");
           console.log(response.data);
           localStorage.setItem("token", response.data.token);
           localStorage.setItem("role", "faculty");
@@ -64,7 +66,9 @@ function Login() {
         }
       }
     } catch (err) {
-      alert(err?.response?.data?.message || "Login failed. Check console.");
+      toast.error(
+        err?.response?.data?.message || "Login failed. Check console."
+      );
     }
   };
 

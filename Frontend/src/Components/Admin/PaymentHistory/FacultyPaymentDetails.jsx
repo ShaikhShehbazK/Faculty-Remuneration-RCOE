@@ -1,5 +1,13 @@
 import { useEffect, useState } from "react";
-import { Container, Row, Col, Card, Table, Button, Offcanvas } from "react-bootstrap";
+import {
+  Container,
+  Row,
+  Col,
+  Card,
+  Table,
+  Button,
+  Offcanvas,
+} from "react-bootstrap";
 import { FaPrint, FaFileExport, FaBars, FaArrowLeft } from "react-icons/fa";
 import AdminSidebar from "../../AdminSidebar";
 import { useNavigate, useParams } from "react-router-dom";
@@ -184,6 +192,17 @@ function FacultyPaymentDetails() {
               <Button
                 variant="primary"
                 className="d-flex align-items-center gap-2"
+                onClick={() => {
+                  const paymentId = remuneration?.payment?._id; // pick the paymentId for this semType
+                  if (paymentId) {
+                    window.open(
+                      `http://localhost:3002/payment/generate-pdf/${paymentId}`,
+                      "_blank"
+                    );
+                  } else {
+                    console.error("❌ No paymentId found for", semType, year);
+                  }
+                }}
               >
                 <FaPrint /> Print
               </Button>
