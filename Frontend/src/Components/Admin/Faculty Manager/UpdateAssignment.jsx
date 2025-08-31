@@ -216,8 +216,9 @@ function UpdateAssignment({ onSubmit }) {
       </h4>
 
       <Card
-        className="shadow rounded-4 border-0 p-4 bg-white mx-auto"
-        style={{ maxWidth: 800 }}
+        className="mb-4 p-4 mt-4 shadow rounded-4 border-0 bg-white"
+        /* className="shadow rounded-4 border-0 p-4 bg-white mx-auto"
+        style={{ maxWidth: 800 }} */
       >
         {/* ✅ Faculty Name Display */}
         {facultyName && (

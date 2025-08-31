@@ -77,7 +77,7 @@ function PaymentHistories() {
   // For dynamicallly giving colors to status
   const getStatusBadge = (status) => {
     const statusClass = {
-      Completed: "bg-success text-white",
+      paid: "bg-success text-white",
       unpaid: "bg-warning text-dark",
       Failed: "bg-danger text-white",
     };

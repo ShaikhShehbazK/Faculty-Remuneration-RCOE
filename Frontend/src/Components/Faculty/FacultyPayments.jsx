@@ -1,26 +1,7 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import {
-  Container,
-  Row,
-  Col,
-  Nav,
-  Card,
-  Button,
-  Offcanvas,
-  Badge,
-} from "react-bootstrap";
-import {
-  FaBars,
-  FaUser,
-  FaMoneyBillWave,
-  FaHistory,
-  FaFileInvoiceDollar,
-  FaSignOutAlt,
-  FaDownload,
-  FaChevronDown,
-  FaChevronRight,
-} from "react-icons/fa";
+import { Container, Row, Col, Nav, Card, Button, Offcanvas, Badge } from "react-bootstrap";
+import { FaBars, FaUser, FaMoneyBillWave, FaHistory, FaFileInvoiceDollar, FaSignOutAlt, FaDownload, FaChevronDown, FaChevronRight } from "react-icons/fa";
 import FacultySidebar from "../FacultySidebar";
 import axios from "axios";
 

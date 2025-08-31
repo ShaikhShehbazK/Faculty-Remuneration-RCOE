@@ -69,8 +69,8 @@ function FacultyPaymentDetails() {
 
   const getStatusBadge = (status) => {
     const statusClass = {
-      Completed: "bg-success text-white",
-      "In Progress": "bg-info text-white",
+      paid: "bg-success text-white",
+      // In Progress: "bg-info text-white",
       unpaid: "bg-warning text-dark",
       Failed: "bg-danger text-white",
     };
