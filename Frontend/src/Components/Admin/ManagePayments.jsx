@@ -220,19 +220,41 @@ function ManagePayments() {
     return faculty ? faculty.name : 'Unknown Faculty';
   }; */
 
+  // // Filter payments based on search and filters
+  // const filteredPayments = payments.filter((payment) => {
+  //   const facultyName = payment.facultyName;
+  //   const matchesSearch =
+  //     searchTerm === "" ||
+  //     facultyName.includes(searchTerm.toLowerCase()) ||
+  //     payment.academicYear.toString().includes(searchTerm) ||
+  //     payment.semester.toString().includes(searchTerm);
+
+  //   const matchesFaculty =
+  //     filterFaculty === "" || payment.facultyId === filterFaculty;
+  //   const matchesSemester =
+  //     filterSemester === "" || payment.semester.toString() === filterSemester;
+
+  //   return matchesSearch && matchesFaculty && matchesSemester;
+  // });
   // Filter payments based on search and filters
   const filteredPayments = payments.filter((payment) => {
-    const facultyName = payment.facultyName;
+    const facultyName = payment.facultyName || "";
+    const academicYear = payment.academicYear
+      ? payment.academicYear.toString()
+      : "";
+    const semester = payment.semester ? payment.semester.toString() : "";
+
     const matchesSearch =
       searchTerm === "" ||
-      facultyName.includes(searchTerm.toLowerCase()) ||
-      payment.academicYear.toString().includes(searchTerm) ||
-      payment.semester.toString().includes(searchTerm);
+      facultyName.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      academicYear.includes(searchTerm) ||
+      semester.includes(searchTerm);
 
     const matchesFaculty =
       filterFaculty === "" || payment.facultyId === filterFaculty;
+
     const matchesSemester =
-      filterSemester === "" || payment.semester.toString() === filterSemester;
+      filterSemester === "" || semester === filterSemester;
 
     return matchesSearch && matchesFaculty && matchesSemester;
   });
@@ -431,14 +453,14 @@ function ManagePayments() {
                         </td>
                         <td>
                           <div className="d-flex flex-wrap align-items-center gap-2">
-                            <Button
+                            {/* <Button
                               variant="outline-primary"
                               className="d-flex align-items-center px-2 py-1"
                               size="sm"
                               title="View Payment Details"
                             >
                               <FaEye className="me-1" /> <span>View</span>
-                            </Button>
+                            </Button> */}
                             <Button
                               variant="outline-secondary"
                               className="d-flex align-items-center px-2 py-1"
@@ -449,24 +471,24 @@ function ManagePayments() {
                               <FaEdit className="me-1" /> <span>Edit</span>
                             </Button>
                             <Button
-                              variant="outline-success"
+                              variant="success"
                               className="d-flex align-items-center px-2 py-1"
                               size="sm"
                               title="Mark as Paid"
                               onClick={() => handlePay(payment._id)}
                               disabled={payment.status === "paid"}
                             >
-                              <span
+                              {/* <span
                                 role="img"
                                 aria-label="Pay"
                                 className="me-1"
                               >
                                 💰
-                              </span>
-                              <span>Pay</span>
+                              </span> */}
+                              <span>₹ Pay</span>
                             </Button>
                             <Button
-                              variant="outline-info"
+                              variant="info"
                               className="d-flex align-items-center px-2 py-1"
                               size="sm"
                               title="Download Remuneration Slip"

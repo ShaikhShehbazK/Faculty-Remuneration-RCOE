@@ -46,7 +46,13 @@ exports.addFaculty = async (req, res) => {
         };
       })
     );
-
+    const email = req.body.email;
+    const Isexist = await Faculty.findOne({ email });
+    if (Isexist) {
+      return res
+        .status(403)
+        .json({ message: "A faculty with this email already exists" });
+    }
     const hashedPassword = await bcrypt.hash(req.body.password, 12);
 
     const faculty = new Faculty({
@@ -224,15 +230,19 @@ exports.removeSubject = async (req, res) => {
       (a) => a.academicYear === academicYear
     );
     if (!yearBlock) {
-      return res.status(400).json({ error: "No assignments found for this year" });
+      return res
+        .status(400)
+        .json({ error: "No assignments found for this year" });
     }
 
     // find semester block
-    let semBlock = yearBlock.semesters.find(
-      (s) => s.subjects.some((sub) => String(sub.subjectId) === String(subjectId))
+    let semBlock = yearBlock.semesters.find((s) =>
+      s.subjects.some((sub) => String(sub.subjectId) === String(subjectId))
     );
     if (!semBlock) {
-      return res.status(400).json({ error: "No such subject found in this year/semester" });
+      return res
+        .status(400)
+        .json({ error: "No such subject found in this year/semester" });
     }
 
     // remove subject
@@ -242,9 +252,7 @@ exports.removeSubject = async (req, res) => {
 
     // clean up empty semesters
     if (semBlock.subjects.length === 0) {
-      yearBlock.semesters = yearBlock.semesters.filter(
-        (s) => s !== semBlock
-      );
+      yearBlock.semesters = yearBlock.semesters.filter((s) => s !== semBlock);
     }
 
     // clean up empty year blocks
@@ -261,7 +269,6 @@ exports.removeSubject = async (req, res) => {
     res.status(500).json({ error: "Server error", details: err.message });
   }
 };
-
 
 // GET /admin/faculty/getAll
 exports.getAllFaculties = async (req, res) => {
@@ -315,13 +322,14 @@ exports.editFaculty = async (req, res) => {
  */
     const faculty = await Faculty.findByIdAndUpdate(req.params.id, updateData, {
       new: true,
-    }).populate("assignedSubjects.subjectId");
+    });
+    // .populate("assignedSubjects.subjectId");
 
     if (!faculty) {
       return res.status(404).json({ error: "Faculty not found" });
     }
 
-    res.json(faculty);
+    res.status(200).json({ message: "Faculty Updated Successfully" });
   } catch (err) {
     res.status(400).json({ error: "Update failed", details: err.message });
   }

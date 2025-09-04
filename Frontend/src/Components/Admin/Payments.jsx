@@ -67,7 +67,7 @@ function Payments() {
     setSelectedFaculty(facultyId);
     setSelectedSemester("");
     setSubjects([]);
-    setFacultyData(null);
+    // setFacultyData(null);
 
     if (facultyId) {
       try {
@@ -77,8 +77,6 @@ function Payments() {
           `http://localhost:3002/admin/payment/faculty/${facultyId}`
         );
         setFacultyData(facultyResponse.data);
-
-        // Fetch semesters for this faculty
         const semestersResponse = await api.get(
           `http://localhost:3002/admin/payment/faculty/${facultyId}/semesters`
         );
@@ -92,7 +90,6 @@ function Payments() {
       }
     }
   };
-
   // Handle semester selection
   const handleSemesterChange = async (semesterJson) => {
     setSelectedSemester(semesterJson);
@@ -668,33 +665,34 @@ function Payments() {
             </Row>
 
             {/* Term Work Assessment - Only show if subject has term test */}
-            {selectedSubjectDetails?.hasTermTest && (
-              <Row className="mb-3">
-                <Col md={3}>
-                  <Form.Group>
-                    <Form.Label>No. of Term Work Papers</Form.Label>
-                    <Form.Control
-                      type="number"
-                      value={termWorkPapers}
-                      onChange={(e) => setTermWorkPapers(e.target.value)}
-                    />
-                  </Form.Group>
-                </Col>
-                <Col md={3}>
-                  <Form.Group>
-                    <Form.Label>Rate per Paper</Form.Label>
-                    <InputGroup>
-                      <InputGroup.Text>₹</InputGroup.Text>
+            {selectedSubjectDetails?.hasTermTest &&
+              facultyData.designation !== "External Examiner" && (
+                <Row className="mb-3">
+                  <Col md={3}>
+                    <Form.Group>
+                      <Form.Label>No. of Term Work Papers</Form.Label>
                       <Form.Control
                         type="number"
-                        value={termWorkRate}
-                        onChange={(e) => setTermWorkRate(e.target.value)}
+                        value={termWorkPapers}
+                        onChange={(e) => setTermWorkPapers(e.target.value)}
                       />
-                    </InputGroup>
-                  </Form.Group>
-                </Col>
-              </Row>
-            )}
+                    </Form.Group>
+                  </Col>
+                  <Col md={3}>
+                    <Form.Group>
+                      <Form.Label>Rate per Paper</Form.Label>
+                      <InputGroup>
+                        <InputGroup.Text>₹</InputGroup.Text>
+                        <Form.Control
+                          type="number"
+                          value={termWorkRate}
+                          onChange={(e) => setTermWorkRate(e.target.value)}
+                        />
+                      </InputGroup>
+                    </Form.Group>
+                  </Col>
+                </Row>
+              )}
 
             {/* Oral/Practical Assessment - Only show if subject has practical */}
             {selectedSubjectDetails?.hasPractical && (
@@ -726,33 +724,34 @@ function Payments() {
             )}
 
             {/* Semester Papers - Only show if subject has semester exam */}
-            {selectedSubjectDetails?.hasSemesterExam && (
-              <Row className="mb-3">
-                <Col md={3}>
-                  <Form.Group>
-                    <Form.Label>Semester Papers</Form.Label>
-                    <Form.Control
-                      type="number"
-                      value={semesterPapers}
-                      onChange={(e) => setSemesterPapers(e.target.value)}
-                    />
-                  </Form.Group>
-                </Col>
-                <Col md={3}>
-                  <Form.Group>
-                    <Form.Label>Rate per Paper</Form.Label>
-                    <InputGroup>
-                      <InputGroup.Text>₹</InputGroup.Text>
+            {selectedSubjectDetails?.hasSemesterExam &&
+              facultyData.designation !== "External Examiner" && (
+                <Row className="mb-3">
+                  <Col md={3}>
+                    <Form.Group>
+                      <Form.Label>Semester Papers</Form.Label>
                       <Form.Control
                         type="number"
-                        value={semesterRate}
-                        onChange={(e) => setSemesterRate(e.target.value)}
+                        value={semesterPapers}
+                        onChange={(e) => setSemesterPapers(e.target.value)}
                       />
-                    </InputGroup>
-                  </Form.Group>
-                </Col>
-              </Row>
-            )}
+                    </Form.Group>
+                  </Col>
+                  <Col md={3}>
+                    <Form.Group>
+                      <Form.Label>Rate per Paper</Form.Label>
+                      <InputGroup>
+                        <InputGroup.Text>₹</InputGroup.Text>
+                        <Form.Control
+                          type="number"
+                          value={semesterRate}
+                          onChange={(e) => setSemesterRate(e.target.value)}
+                        />
+                      </InputGroup>
+                    </Form.Group>
+                  </Col>
+                </Row>
+              )}
 
             {/* Calculated Total - Always show */}
             <Row className="mb-3">

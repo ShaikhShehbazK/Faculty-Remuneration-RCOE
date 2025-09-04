@@ -1,9 +1,28 @@
 import React, { useState, useEffect } from "react";
-import { Container, Form, Row, Col, Button, Alert, Card, Badge } from "react-bootstrap";
-import { FaArrowLeft, FaUserPlus, FaUserTie, FaBookOpen, FaEnvelope, FaPhone, FaCalendarAlt, FaLayerGroup } from "react-icons/fa";
+import {
+  Container,
+  Form,
+  Row,
+  Col,
+  Button,
+  Alert,
+  Card,
+  Badge,
+} from "react-bootstrap";
+import {
+  FaArrowLeft,
+  FaUserPlus,
+  FaUserTie,
+  FaBookOpen,
+  FaEnvelope,
+  FaPhone,
+  FaCalendarAlt,
+  FaLayerGroup,
+} from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
 import api from "../../../utils/api";
 import Select from "react-select";
+import toast from "react-hot-toast";
 
 function AddFacultyForm() {
   const navigate = useNavigate();
@@ -29,8 +48,21 @@ function AddFacultyForm() {
 
   const [subjectOptions, setSubjectOptions] = useState([]);
 
-  const departments = [ "Computer", "Mechanical", "Electrical", "Civil", "AIDS", "ECS" ];
-  const designations = [ "Professor", "Associate Professor", "Assistant Professor", "HoD", "External Examiner" ];
+  const departments = [
+    "Computer",
+    "Mechanical",
+    "Electrical",
+    "Civil",
+    "AIDS",
+    "ECS",
+  ];
+  const designations = [
+    "Professor",
+    "Associate Professor",
+    "Assistant Professor",
+    "HoD",
+    "External Examiner",
+  ];
 
   // ✅ Get semester options dynamically based on type
   const getSemesterOptions = () => {
@@ -44,7 +76,9 @@ function AddFacultyForm() {
     const fetchSubjects = async () => {
       if (formData.semester) {
         try {
-          const res = await api.get(`/faculty/subject/getList?semester=${formData.semester}`);
+          const res = await api.get(
+            `/faculty/subject/getList?semester=${formData.semester}`
+          );
           const subjectNames = res.data.map((subj) => subj.name);
           setSubjectOptions(subjectNames);
         } catch (err) {
@@ -67,33 +101,33 @@ function AddFacultyForm() {
   };
 
   const handleAddAssignment = (e) => {
-  e.preventDefault();
-  if (formData.semester && formData.subject) {
-    const exists = assignedSubjects.some(
-      (a) =>
-        a.academicYear === formData.academicYear &&
-        a.semesterType === formData.semesterType &&
-        a.semester === formData.semester &&
-        a.subject === formData.subject
-    );
+    e.preventDefault();
+    if (formData.semester && formData.subject) {
+      const exists = assignedSubjects.some(
+        (a) =>
+          a.academicYear === formData.academicYear &&
+          a.semesterType === formData.semesterType &&
+          a.semester === formData.semester &&
+          a.subject === formData.subject
+      );
 
-    if (!exists) {
-      setAssignedSubjects((prev) => [
-        ...prev,
-        {
-          academicYear: formData.academicYear,
-          semesterType: formData.semesterType,
-          semester: formData.semester,
-          subject: formData.subject,
-        },
-      ]);
+      if (!exists) {
+        setAssignedSubjects((prev) => [
+          ...prev,
+          {
+            academicYear: formData.academicYear,
+            semesterType: formData.semesterType,
+            semester: formData.semester,
+            subject: formData.subject,
+          },
+        ]);
+      }
+
+      setFormData((prev) => ({ ...prev, subject: "", semester: "" }));
     }
+  };
 
-    setFormData((prev) => ({ ...prev, subject: "", semester: "" }));
-  }
-};
-
-/*   const handleAddAssignment = (e) => {
+  /*   const handleAddAssignment = (e) => {
     e.preventDefault();
     if (formData.semester && formData.subject) {
       const exists = assignedSubjects.some((a) => a.semester === formData.semester && a.subject === formData.subject);
@@ -113,85 +147,89 @@ function AddFacultyForm() {
   };
 
   const handleSubmit = async (e) => {
-  e.preventDefault();
-  setLoading(true);
-  setError("");
+    e.preventDefault();
+    setLoading(true);
+    setError("");
 
-  try {
-    // Group by academicYear and semesterType
-    const academicAssignments = [];
+    try {
+      // Group by academicYear and semesterType
+      const academicAssignments = [];
 
-    assignedSubjects.forEach((a) => {
-      let yearGroup = academicAssignments.find(
-        (grp) => grp.academicYear === a.academicYear
-      );
-      if (!yearGroup) {
-        yearGroup = { academicYear: a.academicYear, semesters: [] };
-        academicAssignments.push(yearGroup);
-      }
+      assignedSubjects.forEach((a) => {
+        let yearGroup = academicAssignments.find(
+          (grp) => grp.academicYear === a.academicYear
+        );
+        if (!yearGroup) {
+          yearGroup = { academicYear: a.academicYear, semesters: [] };
+          academicAssignments.push(yearGroup);
+        }
 
-      let semGroup = yearGroup.semesters.find(
-        (s) => s.semesterType === a.semesterType
-      );
-      if (!semGroup) {
-        semGroup = { semesterType: a.semesterType, subjects: [] };
-        yearGroup.semesters.push(semGroup);
-      }
+        let semGroup = yearGroup.semesters.find(
+          (s) => s.semesterType === a.semesterType
+        );
+        if (!semGroup) {
+          semGroup = { semesterType: a.semesterType, subjects: [] };
+          yearGroup.semesters.push(semGroup);
+        }
 
-      semGroup.subjects.push({
-        name: a.subject,
-        semester: Number(a.semester),
+        semGroup.subjects.push({
+          name: a.subject,
+          semester: Number(a.semester),
+        });
       });
-    });
 
-    const facultyData = {
-      name: formData.name,
-      email: formData.email,
-      password: formData.password,
-      phone: formData.phone,
-      department: formData.department,
-      designation: formData.designation,
-      baseSalary: Number(formData.baseSalary),
-      travelAllowance: Number(formData.travelAllowance),
-      academicAssignments, // ✅ final nested structure
-    };
+      const facultyData = {
+        name: formData.name,
+        email: formData.email,
+        password: formData.password,
+        phone: formData.phone,
+        department: formData.department,
+        designation: formData.designation,
+        baseSalary: Number(formData.baseSalary),
+        travelAllowance: Number(formData.travelAllowance),
+        academicAssignments, // ✅ final nested structure
+      };
 
-    const response = await api.post("/admin/faculty/add", facultyData);
-    console.log("Faculty created successfully:", response.data);
-    setSuccess(true);
+      const response = await api.post("/admin/faculty/add", facultyData);
+      console.log("Faculty created successfully:", response.data);
+      setSuccess(true);
 
-    // reset
-    setFormData({
-      name: "",
-      department: "",
-      designation: "",
-      email: "",
-      password: "",
-      phone: "",
-      baseSalary: "",
-      travelAllowance: "",
-      academicYear: "",
-      semesterType: "",
-      semester: "",
-      subject: "",
-    });
-    setAssignedSubjects([]);
-    setTimeout(() => setSuccess(false), 5000);
-  } catch (err) {
-    console.error("Error creating faculty:", err);
-    if (err.response?.status === 401) {
-      alert("Authentication failed. Please login again.");
-      navigate("/login");
-    } else {
-      setError(
-        err.response?.data?.error ||
-          "Failed to create faculty. Please try again."
-      );
+      // reset
+      setFormData({
+        name: "",
+        department: "",
+        designation: "",
+        email: "",
+        password: "",
+        phone: "",
+        baseSalary: "",
+        travelAllowance: "",
+        academicYear: "",
+        semesterType: "",
+        semester: "",
+        subject: "",
+      });
+      setAssignedSubjects([]);
+      setTimeout(() => setSuccess(false), 5000);
+    } catch (err) {
+      console.error("Error creating faculty:", err);
+      if (err.response?.status === 403) {
+        // alert("A faculty with this email already exists.");
+        toast.error("A faculty with this email already exists.");
+      } else if (err.response?.status === 401) {
+        // alert("Authentication failed. Please login again.");
+        toast.error("Authentication failed. Please login again.");
+        navigate("/login");
+      } else {
+        setError(
+          err.response?.data?.error ||
+            "Failed to create faculty. Please try again."
+        );
+      }
+    } finally {
+      setLoading(false);
     }
-  } finally {
-    setLoading(false);
-  }
-};
+  };
 
   /* const handleSubmit = async (e) => {
     e.preventDefault();

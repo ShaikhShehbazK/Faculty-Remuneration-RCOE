@@ -26,6 +26,7 @@ import UpdateAssignment from "./Components/Admin/Faculty Manager/UpdateAssignmen
 import Logout from "./Components/Logout";
 import Unauthorized from "./Components/UnAuthorized";
 import { Toaster } from "react-hot-toast";
+import SubjectsManagement from "./Components/Admin/Subject Manager/SubjectManagement";
 
 function App() {
   return (
@@ -43,10 +44,10 @@ function App() {
             element={<ManagePayments />}
           ></Route>
 
-          <Route
+          {/* <Route
             path="/admin/paymentstatus"
             element={<PaymentStatus />}
-          ></Route>
+          ></Route> */}
 
           <Route
             path="/admin/paymenthistory"
@@ -86,6 +87,11 @@ function App() {
           <Route
             path="/admin/facultymanager/update/:id"
             element={<UpdateAssignment />}
+          ></Route>
+
+          <Route
+            path="/admin/subjectmanager"
+            element={<SubjectsManagement />}
           ></Route>
         </Route>
 

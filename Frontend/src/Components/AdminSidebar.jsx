@@ -5,26 +5,27 @@ import {
   FaHistory,
   FaUsers,
   FaSignOutAlt,
+  FaBook,
 } from "react-icons/fa";
 import { NavLink } from "react-router-dom";
 
 function AdminSidebar() {
   const menuItems = [
-    { 
-      icon: <FaMoneyCheckAlt />, 
-      label: "Payments", 
-      path: "/admin/payments" 
+    {
+      icon: <FaMoneyCheckAlt />,
+      label: "Payments",
+      path: "/admin/payments",
     },
     {
       icon: <FaSyncAlt />,
       label: "Payment Management",
       path: "/admin/managepayments",
     },
-    {
-      icon: <FaCheckCircle />,
-      label: "Payment Status",
-      path: "/admin/paymentstatus",
-    },
+    // {
+    //   icon: <FaCheckCircle />,
+    //   label: "Payment Status",
+    //   path: "/admin/paymentstatus",
+    // },
     {
       icon: <FaHistory />,
       label: "Payment History",
@@ -34,6 +35,11 @@ function AdminSidebar() {
       icon: <FaUsers />,
       label: "Faculty Management",
       path: "/admin/facultymanager",
+    },
+    {
+      icon: <FaBook />,
+      label: "Subject Management",
+      path: "/admin/subjectmanager",
     },
   ];
 
@@ -74,14 +80,12 @@ function AdminSidebar() {
             <FaSignOutAlt /> Logout
           </a>
         </li>
-
       </ul>
     </>
   );
 }
 
 export default AdminSidebar;
-
 
 /* import {
   FaMoneyCheckAlt,
