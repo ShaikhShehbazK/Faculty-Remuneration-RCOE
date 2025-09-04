@@ -354,7 +354,7 @@ exports.postCreate = async (req, res) => {
       };
 
       // 💠 Term Test
-      if (subject.hasTermTest) {
+      if (subject.hasTermTest && faculty.designation !== "External Examiner") {
         const { count = 0, rate = 0 } = subjectItem.termTestAssessment || {};
         const amount = count * rate;
         updated.termTestAssessment = { applicable: true, count, rate, amount };
@@ -376,7 +376,10 @@ exports.postCreate = async (req, res) => {
       }
 
       // 💠 Paper Checking
-      if (subject.hasSemesterExam) {
+      if (
+        subject.hasSemesterExam &&
+        faculty.designation !== "External Examiner"
+      ) {
         const { count = 0, rate = 0 } = subjectItem.paperChecking || {};
         const amount = count * rate;
         updated.paperChecking = { applicable: true, count, rate, amount };
