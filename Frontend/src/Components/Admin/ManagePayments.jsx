@@ -1,22 +1,6 @@
 import { useState, useEffect } from "react";
-import {
-  Container,
-  Row,
-  Col,
-  Card,
-  Table,
-  Button,
-  Offcanvas,
-  Form,
-} from "react-bootstrap";
-import {
-  FaEye,
-  FaEdit,
-  FaFileInvoiceDollar,
-  FaBars,
-  FaSearch,
-  FaSyncAlt,
-} from "react-icons/fa";
+import { Container, Row, Col, Card, Table, Button, Offcanvas, Form } from "react-bootstrap";
+import { FaEye, FaEdit, FaFileInvoiceDollar, FaBars, FaSearch, FaSyncAlt } from "react-icons/fa";
 import AdminSidebar from "../AdminSidebar";
 import axios from "axios";
 import api from "../../utils/api";

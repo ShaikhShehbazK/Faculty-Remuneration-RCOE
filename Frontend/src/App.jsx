@@ -27,12 +27,14 @@ import Logout from "./Components/Logout";
 import Unauthorized from "./Components/UnAuthorized";
 import { Toaster } from "react-hot-toast";
 import SubjectsManagement from "./Components/Admin/Subject Manager/SubjectManagement";
+import LandingPage from "./Components/LandingPage";
 
 function App() {
   return (
     <>
       <Routes>
-        <Route path="/" element={<Login />}></Route>
+        <Route path = "/" element={<LandingPage />}></Route>
+        <Route path="/login" element={<Login />}></Route>
         <Route path="/logout" element={<Logout />}></Route>
 
         {/* Only admin */}
@@ -98,7 +100,6 @@ function App() {
         {/* Only faculty */}
         <Route element={<ProtectedRoute allowedRoles={["faculty"]} />}>
           <Route path="/faculty/dashboard" element={<FacultyDashboard />}>
-            {" "}
           </Route>
 
           <Route path="/faculty/payments" element={<FacultyPayments />}>

@@ -508,7 +508,7 @@ function FacultyDetails() {
                                   } else {
                                     console.error(
                                       "❌ No paymentId found for",
-                                      semType,
+                                      // semType,
                                       year
                                     );
                                   }

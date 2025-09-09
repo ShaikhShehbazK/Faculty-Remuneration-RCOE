@@ -571,12 +571,23 @@ exports.getYearPDF = async (req, res) => {
       return res.status(404).send("Payments not found for this faculty/year");
     }
 
-    // ❌ Block slip generation if not paid
-    if (payments.status !== "paid") {
+    // ✅ Ensure all payments are paid
+    const allPaid = payments.every((p) => p.status === "paid");
+    if (!allPaid) {
       return res.status(400).json({
-        message: "Slip can only be generated after payment is successful",
+        message: "Slip can only be generated after all semester payments are successful",
       });
     }
+
+    // payments is an array, not a single document.
+    // So payments.status will always be undefined → which means your yearly slip will always fail with the "not paid" error.
+    // To fix, we check each payment's status above.
+    // ❌ Block slip generation if not paid
+    // if (payments.status !== "paid") {
+    //   return res.status(400).json({
+    //     message: "Slip can only be generated after payment is successful",
+    //   });
+    // }
 
     // Separate Odd & Even
     const oddPayment = payments.find((p) => p.semesterType === "Odd");
