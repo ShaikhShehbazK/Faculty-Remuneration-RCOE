@@ -53,7 +53,6 @@ function UpdateAssignment({ onSubmit }) {
       try {
         const facultyRes = await axios.get(
           `https://rcoe-remune-track.onrender.com/admin/faculty/getSingle/${id}`,
-          {},
           header
         );
         console.log("✅ Getting Faculty Details", facultyRes.data);
@@ -79,7 +78,6 @@ function UpdateAssignment({ onSubmit }) {
         try {
           const res = await axios.get(
             `https://rcoe-remune-track.onrender.com/faculty/subject/getList?semester=${formData.semester}`,
-            {},
             header
           );
           const subjectNames = res.data.map((subj) => subj.name);

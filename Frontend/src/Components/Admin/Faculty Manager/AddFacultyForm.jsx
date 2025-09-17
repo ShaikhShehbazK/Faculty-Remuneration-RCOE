@@ -93,7 +93,6 @@ function AddFacultyForm() {
         try {
           const res = await axios.get(
             `https://rcoe-remune-track.onrender.com/faculty/subject/getList?semester=${formData.semester}`,
-            {},
             header
           );
           const subjectNames = res.data.map((subj) => subj.name);

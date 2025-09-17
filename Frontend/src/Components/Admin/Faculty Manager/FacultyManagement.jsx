@@ -41,7 +41,6 @@ function FacultyManagement() {
         setLoading(true);
         const response = await axios.get(
           "https://rcoe-remune-track.onrender.com/admin/faculty/getAll",
-          {},
           header
         );
         console.log("Fetched faculties:", response.data);
@@ -85,7 +84,6 @@ function FacultyManagement() {
         // Refresh the faculty list
         const response = await axios.get(
           "https://rcoe-remune-track.onrender.com/admin/faculty/getAll",
-          {},
           header
         );
         setFacultyList(response.data);

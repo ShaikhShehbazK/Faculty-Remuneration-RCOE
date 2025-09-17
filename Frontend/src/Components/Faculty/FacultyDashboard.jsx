@@ -49,7 +49,6 @@ function FacultyDashboard() {
       try {
         const facultyRes = await axios.get(
           `https://rcoe-remune-track.onrender.com/admin/faculty/getSingle/${facultyId}`,
-          {},
           header
         );
         console.log("Getting Faculty Details");

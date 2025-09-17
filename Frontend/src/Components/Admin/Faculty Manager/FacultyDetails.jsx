@@ -45,7 +45,6 @@ function FacultyDetails() {
       try {
         const facultyRes = await axios.get(
           `https://rcoe-remune-track.onrender.com/admin/faculty/getSingle/${id}`,
-          {},
           header
         );
         console.log("✅ Getting Faculty Details", facultyRes.data);

@@ -45,20 +45,21 @@ function Payments() {
   useEffect(() => {
     fetchFacultyList();
   }, []);
+
   const token = localStorage.getItem("token");
   const header = {
     headers: {
       Authorization: `Bearer ${token}`, // ✅ Pass the token in Authorization header
     },
   };
+
   // Fetch faculty list
   const fetchFacultyList = async () => {
     try {
       setLoading(true);
       const response = await axios.get(
         "https://rcoe-remune-track.onrender.com/admin/faculty/getAll",
-        {},
-        header
+        header // ✅ pass headers here
       );
       setFacultyList(response.data);
     } catch (error) {

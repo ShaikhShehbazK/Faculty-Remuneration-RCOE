@@ -84,7 +84,6 @@ function EditFaculty() {
         setFetching(true);
         const response = await axios.get(
           `https://rcoe-remune-track.onrender.com/admin/faculty/getSingle/${id}`,
-          {},
           header
         );
         const faculty = response.data;
@@ -149,7 +148,6 @@ function EditFaculty() {
         try {
           const res = await axios.get(
             `https://rcoe-remune-track.onrender.com/faculty/subject/getList?semester=${formData.semester}`,
-            {},
             header
           );
           console.log(res.data);

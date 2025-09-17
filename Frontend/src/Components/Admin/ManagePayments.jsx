@@ -71,7 +71,6 @@ function ManagePayments() {
     try {
       const response = await axios.get(
         "https://rcoe-remune-track.onrender.com/admin/faculty/getAll",
-        {},
         header
       );
       console.log("Fetched faculty list:", response.data);
