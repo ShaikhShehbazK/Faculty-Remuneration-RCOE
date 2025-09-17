@@ -37,7 +37,7 @@ const app = express();
 // );
 app.use(
   cors({
-    origin: "https://rcoe-remune-track.netlify.app/", // ✅ your frontend URL
+    origin: "https://remune-track.netlify.app", // ✅ your frontend URL
     credentials: true, // ✅ required for cookies
   })
 );
