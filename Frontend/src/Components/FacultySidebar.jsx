@@ -31,6 +31,13 @@ function FacultySidebar() {
   const [facultyData, setFacultyData] = useState(null);
   const [loading, setLoading] = useState(true);
 
+  const token = localStorage.getItem("token");
+  const header = {
+    headers: {
+      Authorization: `Bearer ${token}`, // ✅ Pass the token in Authorization header
+    },
+  };
+
   useEffect(() => {
     const facultyId = localStorage.getItem("facultyId");
 
@@ -43,7 +50,6 @@ function FacultySidebar() {
       try {
         const facultyRes = await axios.get(
           `https://rcoe-remune-track.onrender.com/admin/faculty/getSingle/${facultyId}`,
-          {},
           header
         );
         console.log("Getting Faculty Details For dashboard");
