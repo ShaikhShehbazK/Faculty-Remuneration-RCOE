@@ -16,6 +16,7 @@ import { FaSearch, FaEdit, FaTrash, FaPlus, FaBars } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
 import AdminSidebar from "../../AdminSidebar";
 import api from "../../../utils/api";
+import axios from "axios";
 
 function SubjectsManagement() {
   const navigate = useNavigate();

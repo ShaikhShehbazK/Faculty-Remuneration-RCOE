@@ -42,9 +42,9 @@ function Login() {
         if (loginRole === "faculty") {
           localStorage.setItem("role", "faculty");
           localStorage.setItem("facultyId", response.data.id);
-          navigate("/faculty/dashboard");
+          navigate("/faculty/dashboard", { replace: true });
         } else {
-          navigate("/admin/payments");
+          navigate("/admin/payments", { replace: true });
         }
       } else {
         toast.error("Unexpected response from server");

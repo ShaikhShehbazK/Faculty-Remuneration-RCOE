@@ -23,6 +23,7 @@ import { useNavigate } from "react-router-dom";
 import api from "../../../utils/api";
 import Select from "react-select";
 import toast from "react-hot-toast";
+import axios from "axios";
 
 function AddFacultyForm() {
   const navigate = useNavigate();

@@ -132,7 +132,9 @@ function FacultyPaymentDetails() {
               <Button
                 variant="outline-secondary"
                 className="d-flex align-items-center gap-2"
-                onClick={() => navigate("/admin/paymenthistory")}
+                onClick={() =>
+                  navigate("/admin/paymenthistory", { replace: true })
+                }
               >
                 <FaArrowLeft /> Back
               </Button>

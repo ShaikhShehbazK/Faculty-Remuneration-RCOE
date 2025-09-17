@@ -19,6 +19,7 @@ import {
 import { useNavigate, useParams } from "react-router-dom";
 import api from "../../../utils/api";
 import Select from "react-select";
+import axios from "axios";
 
 function EditFaculty() {
   const navigate = useNavigate();
