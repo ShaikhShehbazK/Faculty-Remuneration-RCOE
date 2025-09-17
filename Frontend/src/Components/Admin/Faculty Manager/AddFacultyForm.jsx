@@ -27,6 +27,14 @@ import axios from "axios";
 
 function AddFacultyForm() {
   const navigate = useNavigate();
+
+  const token = JSON.parse(localStorage.getItem("token"));
+  const header = {
+    headers: {
+      Authorization: `Bearer ${token}`, // ✅ Pass the token in Authorization header
+    },
+  };
+
   const [formData, setFormData] = useState({
     name: "",
     department: "",
@@ -78,7 +86,9 @@ function AddFacultyForm() {
       if (formData.semester) {
         try {
           const res = await axios.get(
-            `https://rcoe-remune-track.onrender.com/faculty/subject/getList?semester=${formData.semester}`
+            `https://rcoe-remune-track.onrender.com/faculty/subject/getList?semester=${formData.semester}`,
+            {},
+            header
           );
           const subjectNames = res.data.map((subj) => subj.name);
           setSubjectOptions(subjectNames);
@@ -193,7 +203,9 @@ function AddFacultyForm() {
 
       const response = await axios.post(
         "https://rcoe-remune-track.onrender.com/admin/faculty/add",
-        facultyData
+        facultyData,
+        {},
+        header
       );
       console.log("Faculty created successfully:", response.data);
       setSuccess(true);
@@ -296,7 +308,7 @@ function AddFacultyForm() {
   }; */
 
   const handleGoBack = () => {
-    navigate("https://rcoe-remune-track.onrender.com/admin/facultymanager");
+    navigate("/admin/facultymanager", { replace: true });
   };
 
   return (

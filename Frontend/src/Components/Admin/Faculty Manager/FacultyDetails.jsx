@@ -20,6 +20,12 @@ import AdminSidebar from "../../AdminSidebar";
 import axios from "axios";
 
 function FacultyDetails() {
+  const token = JSON.parse(localStorage.getItem("token"));
+  const header = {
+    headers: {
+      Authorization: `Bearer ${token}`, // ✅ Pass the token in Authorization header
+    },
+  };
   const { id } = useParams(); // URL param: /admin/facultymanager/details/:id
   const [faculty, setFaculty] = useState([]);
   const [remuneration, setRemuneration] = useState([]);
@@ -30,7 +36,7 @@ function FacultyDetails() {
   const handleSidebarClose = () => setShowSidebar(false);
 
   const handleGoBack = () => {
-    navigate("https://rcoe-remune-track.onrender.com/admin/facultymanager");
+    navigate("/admin/facultymanager", { replace: true });
   };
 
   // 1) Fetch faculty
@@ -38,7 +44,9 @@ function FacultyDetails() {
     const fetchFacultyDetails = async () => {
       try {
         const facultyRes = await axios.get(
-          `https://rcoe-remune-track.onrender.com/admin/faculty/getSingle/${id}`
+          `https://rcoe-remune-track.onrender.com/admin/faculty/getSingle/${id}`,
+          {},
+          header
         );
         console.log("✅ Getting Faculty Details", facultyRes.data);
         setFaculty(facultyRes.data);
@@ -271,7 +279,7 @@ function FacultyDetails() {
             <div className="d-flex justify-content-between align-items-center mb-3">
               <h5 className="fw-semibold mb-0">Assigned Subjects</h5>
 
-              <Button
+              {/* <Button
                 variant="outline-primary"
                 size="sm"
                 onClick={() =>
@@ -281,6 +289,17 @@ function FacultyDetails() {
                       state: { facultyName: faculty.name },
                     }
                   )
+                }
+              >
+                Update Assignments
+              </Button> */}
+              <Button
+                variant="outline-primary"
+                size="sm"
+                onClick={() =>
+                  navigate(`/admin/facultymanager/update/${id}`, {
+                    state: { facultyName: faculty.name },
+                  })
                 }
               >
                 Update Assignments

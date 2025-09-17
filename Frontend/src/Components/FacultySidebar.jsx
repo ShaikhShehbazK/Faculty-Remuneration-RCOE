@@ -42,7 +42,9 @@ function FacultySidebar() {
     const fetchFacultyData = async () => {
       try {
         const facultyRes = await axios.get(
-          `https://rcoe-remune-track.onrender.com/admin/faculty/getSingle/${facultyId}`
+          `https://rcoe-remune-track.onrender.com/admin/faculty/getSingle/${facultyId}`,
+          {},
+          header
         );
         console.log("Getting Faculty Details For dashboard");
         console.log(facultyRes.data);

@@ -25,6 +25,12 @@ import axios from "axios";
 import api from "../../../utils/api";
 
 function SubjectRemunerationDetails() {
+  const token = JSON.parse(localStorage.getItem("token"));
+  const header = {
+    headers: {
+      Authorization: `Bearer ${token}`, // ✅ Pass the token in Authorization header
+    },
+  };
   const { id, subjectId, academicYear } = useParams(); // id = facultyId
   const navigate = useNavigate();
 
@@ -95,9 +101,7 @@ function SubjectRemunerationDetails() {
   }, [id, subjectId]);
 
   const handleGoBack = () => {
-    navigate(
-      `https://rcoe-remune-track.onrender.com/admin/facultymanager/details/${id}`
-    );
+    navigate(`/admin/facultymanager/details/${id}`);
   };
 
   if (loading) {

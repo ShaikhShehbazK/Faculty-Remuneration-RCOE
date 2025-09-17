@@ -30,7 +30,12 @@ function FacultyDashboard() {
   const [facultyData, setFacultyData] = useState(null);
   const [facultyPayData, setFacultyPayData] = useState(null);
   const [loading, setLoading] = useState(true);
-
+  const token = JSON.parse(localStorage.getItem("token"));
+  const header = {
+    headers: {
+      Authorization: `Bearer ${token}`, // ✅ Pass the token in Authorization header
+    },
+  };
   useEffect(() => {
     const facultyId = localStorage.getItem("facultyId");
     const token = localStorage.getItem("token");
@@ -43,7 +48,9 @@ function FacultyDashboard() {
     const fetchFacultyData = async () => {
       try {
         const facultyRes = await axios.get(
-          `https://rcoe-remune-track.onrender.com/admin/faculty/getSingle/${facultyId}`
+          `https://rcoe-remune-track.onrender.com/admin/faculty/getSingle/${facultyId}`,
+          {},
+          header
         );
         console.log("Getting Faculty Details");
         console.log(facultyRes.data);

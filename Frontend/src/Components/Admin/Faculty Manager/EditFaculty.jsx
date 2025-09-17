@@ -23,6 +23,13 @@ import axios from "axios";
 
 function EditFaculty() {
   const navigate = useNavigate();
+
+  const token = JSON.parse(localStorage.getItem("token"));
+  const header = {
+    headers: {
+      Authorization: `Bearer ${token}`, // ✅ Pass the token in Authorization header
+    },
+  };
   const { id } = useParams(); // Get faculty ID from URL parameters
 
   const [formData, setFormData] = useState({
@@ -76,7 +83,9 @@ function EditFaculty() {
       try {
         setFetching(true);
         const response = await axios.get(
-          `https://rcoe-remune-track.onrender.com/admin/faculty/getSingle/${id}`
+          `https://rcoe-remune-track.onrender.com/admin/faculty/getSingle/${id}`,
+          {},
+          header
         );
         const faculty = response.data;
 
@@ -139,7 +148,9 @@ function EditFaculty() {
       if (formData.semester && formData.semester !== "Select") {
         try {
           const res = await axios.get(
-            `https://rcoe-remune-track.onrender.com/faculty/subject/getList?semester=${formData.semester}`
+            `https://rcoe-remune-track.onrender.com/faculty/subject/getList?semester=${formData.semester}`,
+            {},
+            header
           );
           console.log(res.data);
           const subjectNames = res.data.map((subj) => subj.name); // assuming Subject has a 'name'
@@ -220,7 +231,9 @@ function EditFaculty() {
 
       const response = await axios.put(
         `https://rcoe-remune-track.onrender.com/admin/faculty/edit/${id}`,
-        facultyData
+        facultyData,
+        {},
+        header
       );
 
       console.log("Faculty updated successfully:", response.data);
@@ -228,7 +241,7 @@ function EditFaculty() {
 
       setTimeout(() => {
         setSuccess(false);
-        navigate("https://rcoe-remune-track.onrender.com/admin/facultymanager");
+        navigate("/admin/facultymanager", { replace: true });
       }, 2000);
     } catch (err) {
       console.error("Error updating faculty:", err);
@@ -247,7 +260,7 @@ function EditFaculty() {
   };
 
   const handleGoBack = () => {
-    navigate("https://rcoe-remune-track.onrender.com/admin/facultymanager");
+    navigate("/admin/facultymanager", { replace: true });
   };
 
   if (fetching) {

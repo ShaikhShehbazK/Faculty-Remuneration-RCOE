@@ -42,6 +42,13 @@ function SubjectsManagement() {
   const handleSidebarOpen = () => setShowSidebar(true);
   const handleSidebarClose = () => setShowSidebar(false);
 
+  const token = JSON.parse(localStorage.getItem("token"));
+  const header = {
+    headers: {
+      Authorization: `Bearer ${token}`, // ✅ Pass the token in Authorization header
+    },
+  };
+
   // Fetch Subjects
   useEffect(() => {
     fetchSubjects();
@@ -51,7 +58,9 @@ function SubjectsManagement() {
     try {
       setLoading(true);
       const res = await axios.get(
-        "https://rcoe-remune-track.onrender.com/faculty/subject/getList"
+        "https://rcoe-remune-track.onrender.com/faculty/subject/getList",
+        {},
+        header
       );
       setSubjects(res.data);
       setError("");
@@ -107,13 +116,15 @@ function SubjectsManagement() {
       if (editingSubject) {
         await axios.put(
           `https://rcoe-remune-track.onrender.com/faculty/subject/update/${editingSubject}`,
-          subjectData
+          subjectData,
+          header
         );
         alert("Subject updated successfully");
       } else {
         await axios.post(
           "https://rcoe-remune-track.onrender.com/faculty/subject/create",
-          subjectData
+          subjectData,
+          header
         );
         alert("Subject created successfully");
       }
@@ -130,7 +141,8 @@ function SubjectsManagement() {
     if (window.confirm(`Are you sure you want to delete ${subjectName}?`)) {
       try {
         await axios.delete(
-          `https://rcoe-remune-track.onrender.com/faculty/subject/delete/${subjectId}`
+          `https://rcoe-remune-track.onrender.com/faculty/subject/delete/${subjectId}`,
+          header
         );
         alert("Subject deleted successfully");
         fetchSubjects();

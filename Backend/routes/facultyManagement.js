@@ -16,19 +16,19 @@ facultyManagement.post(
 facultyManagement.put(
   "/:id/update",
   jwtAuthMiddleware,
-  isAdmin,  
+  isAdmin,
   facultyManagementC.updateAssignments
 );
 
 // Remove asssigned subjects
 facultyManagement.put(
   "/:id/remove-subject",
-  /* jwtAuthMiddleware,
-  isAdmin, */  
+  jwtAuthMiddleware,
+  isAdmin,
   facultyManagementC.removeSubject
 );
 
-// ✅ Get All Faculties 
+// ✅ Get All Faculties
 facultyManagement.get(
   "/getAll",
   jwtAuthMiddleware,
@@ -39,8 +39,8 @@ facultyManagement.get(
 // ✅ Get Single Faculty by ID
 facultyManagement.get(
   "/getSingle/:id",
-  /* jwtAuthMiddleware,
-  isAdmin, */
+  jwtAuthMiddleware,
+  isAdmin,
   facultyManagementC.getSingleFaculty
 );
 

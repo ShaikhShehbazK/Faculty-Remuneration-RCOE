@@ -32,7 +32,12 @@ function FacultyPayments() {
   const handleSidebarOpen = () => setShowSidebar(true);
   const handleSidebarClose = () => setShowSidebar(false);
   const [paymentData, setPaymentData] = useState({}); // initially empty
-
+  const token = JSON.parse(localStorage.getItem("token"));
+  const header = {
+    headers: {
+      Authorization: `Bearer ${token}`, // ✅ Pass the token in Authorization header
+    },
+  };
   useEffect(() => {
     const facultyId = localStorage.getItem("facultyId");
     const fetchPayments = async () => {

@@ -24,6 +24,12 @@ import api from "../../../utils/api";
 import axios from "axios";
 
 function UpdateAssignment({ onSubmit }) {
+  const token = JSON.parse(localStorage.getItem("token"));
+  const header = {
+    headers: {
+      Authorization: `Bearer ${token}`, // ✅ Pass the token in Authorization header
+    },
+  };
   const navigate = useNavigate();
   const location = useLocation();
   const { id } = useParams();
@@ -46,7 +52,9 @@ function UpdateAssignment({ onSubmit }) {
     const fetchFacultyDetails = async () => {
       try {
         const facultyRes = await axios.get(
-          `https://rcoe-remune-track.onrender.com/admin/faculty/getSingle/${id}`
+          `https://rcoe-remune-track.onrender.com/admin/faculty/getSingle/${id}`,
+          {},
+          header
         );
         console.log("✅ Getting Faculty Details", facultyRes.data);
         setFaculty(facultyRes.data);
@@ -70,7 +78,9 @@ function UpdateAssignment({ onSubmit }) {
       if (formData.semester && formData.semester !== "Select") {
         try {
           const res = await axios.get(
-            `https://rcoe-remune-track.onrender.com/faculty/subject/getList?semester=${formData.semester}`
+            `https://rcoe-remune-track.onrender.com/faculty/subject/getList?semester=${formData.semester}`,
+            {},
+            header
           );
           const subjectNames = res.data.map((subj) => subj.name);
           setSubjectOptions(subjectNames);
@@ -135,7 +145,8 @@ function UpdateAssignment({ onSubmit }) {
           academicYear,
           semesterType,
           subjectId,
-        }
+        },
+        header
       );
 
       // Update UI: remove the subject from local faculty state
@@ -185,9 +196,9 @@ function UpdateAssignment({ onSubmit }) {
         {
           academicYear: formData.academicYear,
           semesterType: formData.semesterType,
-          subjects:
-            formData.subjects /* .map((subj) => ({ name: subj.name, semester: subj.semester, })), */,
-        }
+          subjects: formData.subjects,
+        },
+        header // headers go here
       );
 
       // reset
@@ -214,9 +225,7 @@ function UpdateAssignment({ onSubmit }) {
   }; */
 
   const handleGoBack = () => {
-    navigate(
-      `https://rcoe-remune-track.onrender.com/admin/facultymanager/details/${id}`
-    );
+    navigate(`/admin/facultymanager/details/${id}`, { replace: true });
   };
 
   return (

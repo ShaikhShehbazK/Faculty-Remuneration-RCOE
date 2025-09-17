@@ -14,6 +14,12 @@ import { useNavigate, useParams } from "react-router-dom";
 import axios from "axios";
 
 function FacultyPaymentDetails() {
+  const token = JSON.parse(localStorage.getItem("token"));
+  const header = {
+    headers: {
+      Authorization: `Bearer ${token}`, // ✅ Pass the token in Authorization header
+    },
+  };
   const [showSidebar, setShowSidebar] = useState(false);
   const handleSidebarOpen = () => setShowSidebar(true);
   const handleSidebarClose = () => setShowSidebar(false);
@@ -173,11 +179,7 @@ function FacultyPaymentDetails() {
               <Button
                 variant="outline-secondary"
                 className="d-flex align-items-center gap-2"
-                onClick={() =>
-                  navigate(
-                    "https://rcoe-remune-track.onrender.com/admin/paymenthistory"
-                  )
-                }
+                onClick={() => navigate("/admin/paymenthistory")}
               >
                 <FaArrowLeft /> Back
               </Button>

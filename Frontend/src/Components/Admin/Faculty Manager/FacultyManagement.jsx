@@ -18,6 +18,12 @@ import api from "../../../utils/api";
 import axios from "axios";
 
 function FacultyManagement() {
+  const token = JSON.parse(localStorage.getItem("token"));
+  const header = {
+    headers: {
+      Authorization: `Bearer ${token}`, // ✅ Pass the token in Authorization header
+    },
+  };
   const navigate = useNavigate();
   const [showSidebar, setShowSidebar] = useState(false);
   const [facultyList, setFacultyList] = useState([]);
@@ -34,7 +40,9 @@ function FacultyManagement() {
       try {
         setLoading(true);
         const response = await axios.get(
-          "https://rcoe-remune-track.onrender.com/admin/faculty/getAll"
+          "https://rcoe-remune-track.onrender.com/admin/faculty/getAll",
+          {},
+          header
         );
         console.log("Fetched faculties:", response.data);
         setFacultyList(response.data);
@@ -55,30 +63,30 @@ function FacultyManagement() {
   }, [navigate]);
 
   const handleFacultyClick = (facultyId) => {
-    navigate(
-      `https://rcoe-remune-track.onrender.com/admin/facultymanager/details/${facultyId}`
-    );
+    navigate(`/admin/facultymanager/details/${facultyId}`);
   };
 
   const handleAddFaculty = () => {
-    navigate("https://rcoe-remune-track.onrender.com/admin/facultymanager/add");
+    navigate("/admin/facultymanager/add");
   };
 
   const handleEditFaculty = (facultyId) => {
-    navigate(
-      `https://rcoe-remune-track.onrender.com/admin/facultymanager/edit/${facultyId}`
-    );
+    navigate(`/admin/facultymanager/edit/${facultyId}`);
   };
 
   const handleDeleteFaculty = async (facultyId, facultyName) => {
     if (window.confirm(`Are you sure you want to delete ${facultyName}?`)) {
       try {
         await axios.delete(
-          `https://rcoe-remune-track.onrender.com/admin/faculty/delete/${facultyId}`
+          `https://rcoe-remune-track.onrender.com/admin/faculty/delete/${facultyId}`,
+          {},
+          header
         );
         // Refresh the faculty list
         const response = await axios.get(
-          "https://rcoe-remune-track.onrender.com/admin/faculty/getAll"
+          "https://rcoe-remune-track.onrender.com/admin/faculty/getAll",
+          {},
+          header
         );
         setFacultyList(response.data);
         alert("Faculty deleted successfully");
