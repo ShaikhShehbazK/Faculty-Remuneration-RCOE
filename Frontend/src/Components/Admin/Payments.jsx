@@ -50,7 +50,7 @@ function Payments() {
   const fetchFacultyList = async () => {
     try {
       setLoading(true);
-      const response = await api.get(
+      const response = await axios.get(
         "https://rcoe-remune-track.onrender.com/admin/faculty/getAll"
       );
       setFacultyList(response.data);
@@ -73,11 +73,11 @@ function Payments() {
       try {
         setLoading(true);
         // Fetch faculty data
-        const facultyResponse = await api.get(
+        const facultyResponse = await axios.get(
           `https://rcoe-remune-track.onrender.com/admin/payment/faculty/${facultyId}`
         );
         setFacultyData(facultyResponse.data);
-        const semestersResponse = await api.get(
+        const semestersResponse = await axios.get(
           `https://rcoe-remune-track.onrender.com/admin/payment/faculty/${facultyId}/semesters`
         );
         console.log(semestersResponse.data);

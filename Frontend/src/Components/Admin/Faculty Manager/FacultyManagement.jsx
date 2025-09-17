@@ -32,7 +32,9 @@ function FacultyManagement() {
     const fetchFaculties = async () => {
       try {
         setLoading(true);
-        const response = await api.get("/admin/faculty/getAll");
+        const response = await axios.get(
+          "https://rcoe-remune-track.onrender.com/admin/faculty/getAll"
+        );
         console.log("Fetched faculties:", response.data);
         setFacultyList(response.data);
         setError("");
@@ -52,23 +54,31 @@ function FacultyManagement() {
   }, [navigate]);
 
   const handleFacultyClick = (facultyId) => {
-    navigate(`/admin/facultymanager/details/${facultyId}`);
+    navigate(
+      `https://rcoe-remune-track.onrender.com/admin/facultymanager/details/${facultyId}`
+    );
   };
 
   const handleAddFaculty = () => {
-    navigate("/admin/facultymanager/add");
+    navigate("https://rcoe-remune-track.onrender.com/admin/facultymanager/add");
   };
 
   const handleEditFaculty = (facultyId) => {
-    navigate(`/admin/facultymanager/edit/${facultyId}`);
+    navigate(
+      `https://rcoe-remune-track.onrender.com/admin/facultymanager/edit/${facultyId}`
+    );
   };
 
   const handleDeleteFaculty = async (facultyId, facultyName) => {
     if (window.confirm(`Are you sure you want to delete ${facultyName}?`)) {
       try {
-        await api.delete(`/admin/faculty/delete/${facultyId}`);
+        await axios.delete(
+          `https://rcoe-remune-track.onrender.com/admin/faculty/delete/${facultyId}`
+        );
         // Refresh the faculty list
-        const response = await api.get("/admin/faculty/getAll");
+        const response = await axios.get(
+          "https://rcoe-remune-track.onrender.com/admin/faculty/getAll"
+        );
         setFacultyList(response.data);
         alert("Faculty deleted successfully");
       } catch (err) {

@@ -76,8 +76,8 @@ function AddFacultyForm() {
     const fetchSubjects = async () => {
       if (formData.semester) {
         try {
-          const res = await api.get(
-            `/faculty/subject/getList?semester=${formData.semester}`
+          const res = await axios.get(
+            `https://rcoe-remune-track.onrender.com/faculty/subject/getList?semester=${formData.semester}`
           );
           const subjectNames = res.data.map((subj) => subj.name);
           setSubjectOptions(subjectNames);
@@ -190,7 +190,10 @@ function AddFacultyForm() {
         academicAssignments, // ✅ final nested structure
       };
 
-      const response = await api.post("/admin/faculty/add", facultyData);
+      const response = await axios.post(
+        "https://rcoe-remune-track.onrender.com/admin/faculty/add",
+        facultyData
+      );
       console.log("Faculty created successfully:", response.data);
       setSuccess(true);
 
@@ -254,7 +257,7 @@ function AddFacultyForm() {
         })),
       };
 
-      const response = await api.post("/admin/faculty/add", facultyData);
+      const response = await axios.post("/admin/faculty/add", facultyData);
       console.log("Faculty created successfully:", response.data);
       setSuccess(true);
 
@@ -292,7 +295,7 @@ function AddFacultyForm() {
   }; */
 
   const handleGoBack = () => {
-    navigate("/admin/facultymanager");
+    navigate("https://rcoe-remune-track.onrender.com/admin/facultymanager");
   };
 
   return (

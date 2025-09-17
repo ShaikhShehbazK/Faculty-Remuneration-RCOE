@@ -30,7 +30,7 @@ function FacultyDetails() {
   const handleSidebarClose = () => setShowSidebar(false);
 
   const handleGoBack = () => {
-    navigate("/admin/facultymanager");
+    navigate("https://rcoe-remune-track.onrender.com/admin/facultymanager");
   };
 
   // 1) Fetch faculty
@@ -275,9 +275,12 @@ function FacultyDetails() {
                 variant="outline-primary"
                 size="sm"
                 onClick={() =>
-                  navigate(`/admin/facultymanager/update/${id}`, {
-                    state: { facultyName: faculty.name },
-                  })
+                  navigate(
+                    `https://rcoe-remune-track.onrender.com/admin/facultymanager/update/${id}`,
+                    {
+                      state: { facultyName: faculty.name },
+                    }
+                  )
                 }
               >
                 Update Assignments

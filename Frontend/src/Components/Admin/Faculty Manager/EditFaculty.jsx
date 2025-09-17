@@ -74,7 +74,9 @@ function EditFaculty() {
 
       try {
         setFetching(true);
-        const response = await api.get(`/admin/faculty/getSingle/${id}`);
+        const response = await axios.get(
+          `https://rcoe-remune-track.onrender.com/admin/faculty/getSingle/${id}`
+        );
         const faculty = response.data;
 
         console.log("Fetched faculty data:", faculty);
@@ -135,8 +137,8 @@ function EditFaculty() {
       console.log("Fetching subjects for semester:", formData.semester);
       if (formData.semester && formData.semester !== "Select") {
         try {
-          const res = await api.get(
-            `/faculty/subject/getList?semester=${formData.semester}`
+          const res = await axios.get(
+            `https://rcoe-remune-track.onrender.com/faculty/subject/getList?semester=${formData.semester}`
           );
           console.log(res.data);
           const subjectNames = res.data.map((subj) => subj.name); // assuming Subject has a 'name'
@@ -215,14 +217,17 @@ function EditFaculty() {
         facultyData.password = formData.password;
       }
 
-      const response = await api.put(`/admin/faculty/edit/${id}`, facultyData);
+      const response = await axios.put(
+        `https://rcoe-remune-track.onrender.com/admin/faculty/edit/${id}`,
+        facultyData
+      );
 
       console.log("Faculty updated successfully:", response.data);
       setSuccess(true);
 
       setTimeout(() => {
         setSuccess(false);
-        navigate("/admin/facultymanager");
+        navigate("https://rcoe-remune-track.onrender.com/admin/facultymanager");
       }, 2000);
     } catch (err) {
       console.error("Error updating faculty:", err);
@@ -241,7 +246,7 @@ function EditFaculty() {
   };
 
   const handleGoBack = () => {
-    navigate("/admin/facultymanager");
+    navigate("https://rcoe-remune-track.onrender.com/admin/facultymanager");
   };
 
   if (fetching) {

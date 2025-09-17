@@ -171,7 +171,11 @@ function FacultyPaymentDetails() {
               <Button
                 variant="outline-secondary"
                 className="d-flex align-items-center gap-2"
-                onClick={() => navigate("/admin/paymenthistory")}
+                onClick={() =>
+                  navigate(
+                    "https://rcoe-remune-track.onrender.com/admin/paymenthistory"
+                  )
+                }
               >
                 <FaArrowLeft /> Back
               </Button>

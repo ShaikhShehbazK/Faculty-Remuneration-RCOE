@@ -49,7 +49,7 @@ function SubjectsManagement() {
   const fetchSubjects = async () => {
     try {
       setLoading(true);
-      const res = await api.get(
+      const res = await axios.get(
         "https://rcoe-remune-track.onrender.com/faculty/subject/getList"
       );
       setSubjects(res.data);
@@ -104,13 +104,13 @@ function SubjectsManagement() {
   const handleSave = async () => {
     try {
       if (editingSubject) {
-        await api.put(
+        await axios.put(
           `https://rcoe-remune-track.onrender.com/faculty/subject/update/${editingSubject}`,
           subjectData
         );
         alert("Subject updated successfully");
       } else {
-        await api.post(
+        await axios.post(
           "https://rcoe-remune-track.onrender.com/faculty/subject/create",
           subjectData
         );
@@ -128,7 +128,7 @@ function SubjectsManagement() {
   const handleDelete = async (subjectId, subjectName) => {
     if (window.confirm(`Are you sure you want to delete ${subjectName}?`)) {
       try {
-        await api.delete(
+        await axios.delete(
           `https://rcoe-remune-track.onrender.com/faculty/subject/delete/${subjectId}`
         );
         alert("Subject deleted successfully");

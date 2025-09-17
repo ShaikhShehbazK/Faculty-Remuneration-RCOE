@@ -69,7 +69,7 @@ function ManagePayments() {
   // Fetch faculty list for filter dropdown
   const fetchFacultyList = async () => {
     try {
-      const response = await api.get(
+      const response = await axios.get(
         "https://rcoe-remune-track.onrender.com/admin/faculty/getAll"
       );
       console.log("Fetched faculty list:", response.data);

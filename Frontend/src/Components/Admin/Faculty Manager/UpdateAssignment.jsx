@@ -69,8 +69,8 @@ function UpdateAssignment({ onSubmit }) {
     const fetchSubjects = async () => {
       if (formData.semester && formData.semester !== "Select") {
         try {
-          const res = await api.get(
-            `/faculty/subject/getList?semester=${formData.semester}`
+          const res = await axios.get(
+            `https://rcoe-remune-track.onrender.com/faculty/subject/getList?semester=${formData.semester}`
           );
           const subjectNames = res.data.map((subj) => subj.name);
           setSubjectOptions(subjectNames);
@@ -180,12 +180,15 @@ function UpdateAssignment({ onSubmit }) {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      await api.put(`/admin/faculty/${id}/update`, {
-        academicYear: formData.academicYear,
-        semesterType: formData.semesterType,
-        subjects:
-          formData.subjects /* .map((subj) => ({ name: subj.name, semester: subj.semester, })), */,
-      });
+      await axios.put(
+        `https://rcoe-remune-track.onrender.com/admin/faculty/${id}/update`,
+        {
+          academicYear: formData.academicYear,
+          semesterType: formData.semesterType,
+          subjects:
+            formData.subjects /* .map((subj) => ({ name: subj.name, semester: subj.semester, })), */,
+        }
+      );
 
       // reset
       setFormData({
@@ -211,7 +214,9 @@ function UpdateAssignment({ onSubmit }) {
   }; */
 
   const handleGoBack = () => {
-    navigate(`/admin/facultymanager/details/${id}`);
+    navigate(
+      `https://rcoe-remune-track.onrender.com/admin/facultymanager/details/${id}`
+    );
   };
 
   return (

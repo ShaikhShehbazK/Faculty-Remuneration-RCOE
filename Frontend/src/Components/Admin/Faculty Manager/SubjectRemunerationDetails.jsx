@@ -95,7 +95,9 @@ function SubjectRemunerationDetails() {
   }, [id, subjectId]);
 
   const handleGoBack = () => {
-    navigate(`/admin/facultymanager/details/${id}`);
+    navigate(
+      `https://rcoe-remune-track.onrender.com/admin/facultymanager/details/${id}`
+    );
   };
 
   if (loading) {
