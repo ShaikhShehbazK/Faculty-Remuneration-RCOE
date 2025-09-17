@@ -24,7 +24,7 @@ import api from "../../../utils/api";
 import axios from "axios";
 
 function UpdateAssignment({ onSubmit }) {
-  const token = JSON.parse(localStorage.getItem("token"));
+  const token = localStorage.getItem("token");
   const header = {
     headers: {
       Authorization: `Bearer ${token}`, // ✅ Pass the token in Authorization header

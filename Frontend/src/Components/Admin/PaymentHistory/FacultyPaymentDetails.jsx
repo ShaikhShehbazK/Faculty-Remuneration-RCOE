@@ -14,7 +14,7 @@ import { useNavigate, useParams } from "react-router-dom";
 import axios from "axios";
 
 function FacultyPaymentDetails() {
-  const token = JSON.parse(localStorage.getItem("token"));
+  const token = localStorage.getItem("token");
   const header = {
     headers: {
       Authorization: `Bearer ${token}`, // ✅ Pass the token in Authorization header

@@ -26,7 +26,7 @@ function PaymentHistories() {
   const [searchTerm, setSearchTerm] = useState("");
   const [filterFaculty, setFilterFaculty] = useState("");
 
-  const token = JSON.parse(localStorage.getItem("token"));
+  const token = localStorage.getItem("token");
   const header = {
     headers: {
       Authorization: `Bearer ${token}`, // ✅ Pass the token in Authorization header

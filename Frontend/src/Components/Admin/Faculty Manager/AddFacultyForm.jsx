@@ -28,12 +28,18 @@ import axios from "axios";
 function AddFacultyForm() {
   const navigate = useNavigate();
 
-  const token = JSON.parse(localStorage.getItem("token"));
+  const token = localStorage.getItem("token");
   const header = {
     headers: {
       Authorization: `Bearer ${token}`, // ✅ Pass the token in Authorization header
     },
   };
+
+  //  const token = localStorage.getItem("token");
+  //       if (!token) {
+  //         return;
+  //       }
+  //       console.log(token);
 
   const [formData, setFormData] = useState({
     name: "",
