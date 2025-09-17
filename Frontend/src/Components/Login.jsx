@@ -6,7 +6,11 @@ import { motion } from "framer-motion";
 
 function Login() {
   const [loginRole, setLoginRole] = useState("faculty");
-  const [formData, setFormData] = useState({ username: "", password: "", adminId: "" });
+  const [formData, setFormData] = useState({
+    username: "",
+    password: "",
+    adminId: "",
+  });
   const navigate = useNavigate();
 
   const handleInputChange = (e) => {
@@ -15,19 +19,25 @@ function Login() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    const payload = loginRole === "faculty"
-      ? { email: formData.username, password: formData.password }
-      : { email: formData.adminId, password: formData.password };
+    const payload =
+      loginRole === "faculty"
+        ? { email: formData.username, password: formData.password }
+        : { email: formData.adminId, password: formData.password };
 
     try {
-      const url = loginRole === "admin"
-        ? "http://localhost:3002/admin/login"
-        : "http://localhost:3002/faculty/login";
+      const url =
+        loginRole === "admin"
+          ? "http://localhost:3002/admin/login"
+          : "http://localhost:3002/faculty/login";
 
       const response = await axios.post(url, payload);
 
       if (response.data.token) {
-        toast.success(`${loginRole.charAt(0).toUpperCase() + loginRole.slice(1)} Login Successful ✅`);
+        toast.success(
+          `${
+            loginRole.charAt(0).toUpperCase() + loginRole.slice(1)
+          } Login Successful ✅`
+        );
         localStorage.setItem("token", response.data.token);
         if (loginRole === "faculty") {
           localStorage.setItem("role", "faculty");
@@ -40,7 +50,9 @@ function Login() {
         toast.error("Unexpected response from server");
       }
     } catch (err) {
-      toast.error(err?.response?.data?.message || "Login failed. Check console.");
+      toast.error(
+        err?.response?.data?.message || "Login failed. Check console."
+      );
     }
   };
 
@@ -48,13 +60,17 @@ function Login() {
     <div
       className="min-vh-100 d-flex align-items-center justify-content-center position-relative"
       style={{
-        background: "linear-gradient(135deg, #0d6efd88, #0d6efd44), url('/college-banner.jpg')",
+        background:
+          "linear-gradient(135deg, #0d6efd88, #0d6efd44), url('/college-banner.jpg')",
         backgroundSize: "cover",
         backgroundPosition: "center",
       }}
     >
       {/* Floating decorative circles */}
-      <div className="position-absolute top-0 start-0 w-100 h-100" style={{ overflow: "hidden", pointerEvents: "none" }}>
+      <div
+        className="position-absolute top-0 start-0 w-100 h-100"
+        style={{ overflow: "hidden", pointerEvents: "none" }}
+      >
         <motion.div
           className="position-absolute bg-primary rounded-circle"
           style={{ width: 120, height: 120, top: 50, left: 30, opacity: 0.2 }}
@@ -63,7 +79,13 @@ function Login() {
         />
         <motion.div
           className="position-absolute bg-success rounded-circle"
-          style={{ width: 80, height: 80, bottom: 100, right: 50, opacity: 0.15 }}
+          style={{
+            width: 80,
+            height: 80,
+            bottom: 100,
+            right: 50,
+            opacity: 0.15,
+          }}
           animate={{ y: [0, -15, 0] }}
           transition={{ repeat: Infinity, duration: 5 }}
         />
@@ -87,7 +109,9 @@ function Login() {
             <motion.button
               key={role}
               className={`nav-link px-4 py-2 rounded-pill ${
-                loginRole === role ? "active fw-bold bg-primary text-white" : "text-secondary"
+                loginRole === role
+                  ? "active fw-bold bg-primary text-white"
+                  : "text-secondary"
               }`}
               onClick={() => setLoginRole(role)}
               whileHover={{ scale: 1.05 }}
@@ -132,13 +156,23 @@ function Login() {
             value={formData.password}
             onChange={handleInputChange}
             whileFocus={{ scale: 1.02, borderColor: "#0d6efd" }}
+            onFocus={(e) => {
+              e.target.readOnly = false;
+            }}
+            readOnly
             required
           />
 
           <div className="d-flex justify-content-between align-items-center">
             <div className="form-check">
-              <input type="checkbox" className="form-check-input" id="rememberMe" />
-              <label className="form-check-label small" htmlFor="rememberMe">Remember Me</label>
+              <input
+                type="checkbox"
+                className="form-check-input"
+                id="rememberMe"
+              />
+              <label className="form-check-label small" htmlFor="rememberMe">
+                Remember Me
+              </label>
             </div>
             <button
               type="button"
@@ -168,7 +202,6 @@ function Login() {
 }
 
 export default Login;
-
 
 /* 
 import React, { useState } from "react";

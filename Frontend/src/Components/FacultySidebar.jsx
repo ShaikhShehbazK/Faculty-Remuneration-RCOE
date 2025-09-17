@@ -1,5 +1,10 @@
 import { useEffect, useState } from "react";
-import { FaUser, FaMoneyBillWave, FaHistory, FaSignOutAlt } from "react-icons/fa";
+import {
+  FaUser,
+  FaMoneyBillWave,
+  FaHistory,
+  FaSignOutAlt,
+} from "react-icons/fa";
 import { NavLink } from "react-router-dom";
 import axios from "axios";
 
@@ -16,11 +21,11 @@ function FacultySidebar() {
       label: "Payments",
       path: "/faculty/payments",
     },
-    {
-      icon: <FaHistory />,
-      label: "Payment History",
-      path: "/faculty/payment-history",
-    },
+    // {
+    //   icon: <FaHistory />,
+    //   label: "Payment History",
+    //   path: "/faculty/payment-history",
+    // },
   ];
 
   const [facultyData, setFacultyData] = useState(null);
@@ -55,7 +60,7 @@ function FacultySidebar() {
   if (loading) return <div className="p-4">Loading Dashboard...</div>;
   if (!facultyData) return <div className="p-4">No faculty data found</div>;
 
-  const { name, designation } = facultyData
+  const { name, designation } = facultyData;
 
   return (
     <>
@@ -88,7 +93,8 @@ function FacultySidebar() {
               to={item.path}
               className={({ isActive }) =>
                 `d-flex align-items-center gap-2 px-3 py-2 text-decoration-none rounded ${
-                  isActive ? "bg-primary text-white" : "text-dark" }`
+                  isActive ? "bg-primary text-white" : "text-dark"
+                }`
               }
             >
               {item.icon} {item.label}
@@ -104,7 +110,6 @@ function FacultySidebar() {
             <FaSignOutAlt /> Logout
           </a>
         </li>
-        
       </ul>
     </>
   );
@@ -112,10 +117,7 @@ function FacultySidebar() {
 
 export default FacultySidebar;
 
-
-
-
-  /*   const menuItems = [
+/*   const menuItems = [
     { 
       icon: <FaUser />, 
       label: "Dashboard", 
