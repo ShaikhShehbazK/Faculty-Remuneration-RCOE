@@ -40,7 +40,6 @@ facultyManagement.get(
 facultyManagement.get(
   "/getSingle/:id",
   jwtAuthMiddleware,
-  isAdmin,
   facultyManagementC.getSingleFaculty
 );
 
