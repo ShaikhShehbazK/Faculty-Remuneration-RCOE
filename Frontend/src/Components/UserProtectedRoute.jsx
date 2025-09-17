@@ -15,9 +15,12 @@ const ProtectedRoute = ({ allowedRoles }) => {
           return;
         }
 
-        const res = await axios.get("http://localhost:3002/role", {
-          headers: { Authorization: `Bearer ${token}` },
-        });
+        const res = await axios.get(
+          "https://rcoe-remune-track.onrender.com/role",
+          {
+            headers: { Authorization: `Bearer ${token}` },
+          }
+        );
 
         setUserRole(res.data.userData.role);
       } catch (error) {
@@ -66,7 +69,7 @@ export default ProtectedRoute;
 //       };
 
 //       axios
-//         .get("http://localhost:3002/role", header)
+//         .get("https://rcoe-remune-track.onrender.com/role", header)
 //         .then((response) => {
 //           console.log(response.data.userData);
 //           setUserRole(response.data.userData.role);

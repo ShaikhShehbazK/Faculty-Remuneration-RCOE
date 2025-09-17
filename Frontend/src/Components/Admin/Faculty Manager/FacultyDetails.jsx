@@ -38,7 +38,7 @@ function FacultyDetails() {
     const fetchFacultyDetails = async () => {
       try {
         const facultyRes = await axios.get(
-          `http://localhost:3002/admin/faculty/getSingle/${id}`
+          `https://rcoe-remune-track.onrender.com/admin/faculty/getSingle/${id}`
         );
         console.log("✅ Getting Faculty Details", facultyRes.data);
         setFaculty(facultyRes.data);
@@ -71,7 +71,7 @@ function FacultyDetails() {
         const results = await Promise.all(
           uniqueYears.map(async (year) => {
             const res = await axios.get(
-              `http://localhost:3002/admin/payment/getSinglePayment/${id}/${year}`
+              `https://rcoe-remune-track.onrender.com/admin/payment/getSinglePayment/${id}/${year}`
             );
             return res.data; // shape: { facultyName, department, breakdown }
           })
@@ -94,7 +94,7 @@ function FacultyDetails() {
   /* useEffect(() => {
     const fetchFacultyDetails = async () => {
       try {
-        const facultyRes = await axios.get(`http://localhost:3002/admin/faculty/getSingle/${id}`);
+        const facultyRes = await axios.get(`https://rcoe-remune-track.onrender.com/admin/faculty/getSingle/${id}`);
         console.log("Getting Faculty Details");
         console.log(facultyRes.data);
         setFaculty(facultyRes.data);
@@ -104,7 +104,7 @@ function FacultyDetails() {
 
       try {
         academicYear = faculty.assignedSubjects.academicYear;
-        const paymentRes = await axios.get(`http://localhost:3002/admin/payment/getSinglePayment/${id}/${academicYear}`);
+        const paymentRes = await axios.get(`https://rcoe-remune-track.onrender.com/admin/payment/getSinglePayment/${id}/${academicYear}`);
         console.log("Getting Payment Details");
         console.log(paymentRes.data);
         setRemuneration(paymentRes.data);
@@ -462,7 +462,7 @@ function FacultyDetails() {
                                       const paymentId = semGroup[0]?.paymentId; // pick the paymentId for this semType
                                       if (paymentId) {
                                         window.open(
-                                          `http://localhost:3002/payment/generate-pdf/${paymentId}`,
+                                          `https://rcoe-remune-track.onrender.com/payment/generate-pdf/${paymentId}`,
                                           "_blank"
                                         );
                                       } else {
@@ -502,7 +502,7 @@ function FacultyDetails() {
                                 onClick={() => {
                                   if (id) {
                                     window.open(
-                                      `http://localhost:3002/payment/generate-pdf/${id}/${year}`,
+                                      `https://rcoe-remune-track.onrender.com/payment/generate-pdf/${id}/${year}`,
                                       "_blank"
                                     );
                                   } else {
@@ -515,7 +515,7 @@ function FacultyDetails() {
                                 }}
                                 /* onClick={() =>
                                   navigate(
-                                    `http://localhost:3002/payment/generate-pdf/${id}/${year}`
+                                    `https://rcoe-remune-track.onrender.com/payment/generate-pdf/${id}/${year}`
                                   )
                                 } */
                               >

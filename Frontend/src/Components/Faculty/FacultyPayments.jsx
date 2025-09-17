@@ -1,7 +1,26 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { Container, Row, Col, Nav, Card, Button, Offcanvas, Badge } from "react-bootstrap";
-import { FaBars, FaUser, FaMoneyBillWave, FaHistory, FaFileInvoiceDollar, FaSignOutAlt, FaDownload, FaChevronDown, FaChevronRight } from "react-icons/fa";
+import {
+  Container,
+  Row,
+  Col,
+  Nav,
+  Card,
+  Button,
+  Offcanvas,
+  Badge,
+} from "react-bootstrap";
+import {
+  FaBars,
+  FaUser,
+  FaMoneyBillWave,
+  FaHistory,
+  FaFileInvoiceDollar,
+  FaSignOutAlt,
+  FaDownload,
+  FaChevronDown,
+  FaChevronRight,
+} from "react-icons/fa";
 import FacultySidebar from "../FacultySidebar";
 import axios from "axios";
 
@@ -19,7 +38,7 @@ function FacultyPayments() {
     const fetchPayments = async () => {
       try {
         const res = await axios.get(
-          `http://localhost:3002/admin/payment/getSinglePayment/${facultyId}`
+          `https://rcoe-remune-track.onrender.com/admin/payment/getSinglePayment/${facultyId}`
         );
 
         const payments = res.data.payments;
@@ -232,7 +251,7 @@ function FacultyPayments() {
 
                     if (paymentId) {
                       window.open(
-                        `http://localhost:3002/payment/generate-pdf/${paymentId}`,
+                        `https://rcoe-remune-track.onrender.com/payment/generate-pdf/${paymentId}`,
                         "_blank"
                       );
                     } else {
@@ -323,7 +342,7 @@ function FacultyPayments() {
                     }
 
                     window.open(
-                      `http://localhost:3002/payment/generate-pdf/${facultyId}/${yearPath}`,
+                      `https://rcoe-remune-track.onrender.com/payment/generate-pdf/${facultyId}/${yearPath}`,
                       "_blank"
                     );
                   }}

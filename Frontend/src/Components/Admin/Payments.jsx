@@ -51,7 +51,7 @@ function Payments() {
     try {
       setLoading(true);
       const response = await api.get(
-        "http://localhost:3002/admin/faculty/getAll"
+        "https://rcoe-remune-track.onrender.com/admin/faculty/getAll"
       );
       setFacultyList(response.data);
     } catch (error) {
@@ -74,11 +74,11 @@ function Payments() {
         setLoading(true);
         // Fetch faculty data
         const facultyResponse = await api.get(
-          `http://localhost:3002/admin/payment/faculty/${facultyId}`
+          `https://rcoe-remune-track.onrender.com/admin/payment/faculty/${facultyId}`
         );
         setFacultyData(facultyResponse.data);
         const semestersResponse = await api.get(
-          `http://localhost:3002/admin/payment/faculty/${facultyId}/semesters`
+          `https://rcoe-remune-track.onrender.com/admin/payment/faculty/${facultyId}/semesters`
         );
         console.log(semestersResponse.data);
         setSemesters(semestersResponse.data);
@@ -107,7 +107,7 @@ function Payments() {
       try {
         setLoading(true);
         const response = await axios.get(
-          `http://localhost:3002/admin/payment/faculty/${selectedFaculty}/semester/${sem}/year/${academicYear}/semType/${semesterType}/subjects`
+          `https://rcoe-remune-track.onrender.com/admin/payment/faculty/${selectedFaculty}/semester/${sem}/year/${academicYear}/semType/${semesterType}/subjects`
         );
         console.log(response.data);
         setSubjects(response.data);
@@ -153,7 +153,7 @@ function Payments() {
 
         // Fetch subject details from MongoDB
         const response = await axios.get(
-          `http://localhost:3002/faculty/subject/getList/${selectedSubjectObj.subjectId}`
+          `https://rcoe-remune-track.onrender.com/faculty/subject/getList/${selectedSubjectObj.subjectId}`
         );
         console.log("Subject details:", response.data);
         setSelectedSubjectDetails(response.data);
@@ -392,7 +392,7 @@ function Payments() {
 
       console.log("Sending final payment data:", paymentData);
       const response = await axios.post(
-        "http://localhost:3002/admin/payment/create",
+        "https://rcoe-remune-track.onrender.com/admin/payment/create",
         paymentData
       );
       console.log("Final calculation response:", response.data);

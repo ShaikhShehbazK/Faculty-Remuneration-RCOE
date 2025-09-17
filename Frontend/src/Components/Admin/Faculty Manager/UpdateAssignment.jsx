@@ -1,6 +1,23 @@
 import { useState, useEffect } from "react";
-import { Container, Form, Button, Card, Row, Col, Badge, Table } from "react-bootstrap";
-import { FaArrowLeft, FaBookOpen, FaCalendarAlt, FaLayerGroup, FaPlus, FaTrash, FaUser } from "react-icons/fa";
+import {
+  Container,
+  Form,
+  Button,
+  Card,
+  Row,
+  Col,
+  Badge,
+  Table,
+} from "react-bootstrap";
+import {
+  FaArrowLeft,
+  FaBookOpen,
+  FaCalendarAlt,
+  FaLayerGroup,
+  FaPlus,
+  FaTrash,
+  FaUser,
+} from "react-icons/fa";
 import { useNavigate, useLocation, useParams } from "react-router-dom";
 import Select from "react-select";
 import api from "../../../utils/api";
@@ -29,7 +46,7 @@ function UpdateAssignment({ onSubmit }) {
     const fetchFacultyDetails = async () => {
       try {
         const facultyRes = await axios.get(
-          `http://localhost:3002/admin/faculty/getSingle/${id}`
+          `https://rcoe-remune-track.onrender.com/admin/faculty/getSingle/${id}`
         );
         console.log("✅ Getting Faculty Details", facultyRes.data);
         setFaculty(facultyRes.data);
@@ -113,7 +130,7 @@ function UpdateAssignment({ onSubmit }) {
       }
 
       await axios.put(
-        `http://localhost:3002/admin/faculty/${id}/remove-subject`,
+        `https://rcoe-remune-track.onrender.com/admin/faculty/${id}/remove-subject`,
         {
           academicYear,
           semesterType,

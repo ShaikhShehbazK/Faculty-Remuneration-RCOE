@@ -1,6 +1,22 @@
 import { useState, useEffect } from "react";
-import { Container, Row, Col, Card, Table, Button, Offcanvas, Form } from "react-bootstrap";
-import { FaEye, FaEdit, FaFileInvoiceDollar, FaBars, FaSearch, FaSyncAlt } from "react-icons/fa";
+import {
+  Container,
+  Row,
+  Col,
+  Card,
+  Table,
+  Button,
+  Offcanvas,
+  Form,
+} from "react-bootstrap";
+import {
+  FaEye,
+  FaEdit,
+  FaFileInvoiceDollar,
+  FaBars,
+  FaSearch,
+  FaSyncAlt,
+} from "react-icons/fa";
 import AdminSidebar from "../AdminSidebar";
 import axios from "axios";
 import api from "../../utils/api";
@@ -29,7 +45,7 @@ function ManagePayments() {
       console.log(token);
 
       const response = await axios.post(
-        `http://localhost:3002/make-payment/${paymentId}`,
+        `https://rcoe-remune-track.onrender.com/make-payment/${paymentId}`,
         {},
         {
           headers: { Authorization: `Bearer ${token}` },
@@ -54,7 +70,7 @@ function ManagePayments() {
   const fetchFacultyList = async () => {
     try {
       const response = await api.get(
-        "http://localhost:3002/admin/faculty/getAll"
+        "https://rcoe-remune-track.onrender.com/admin/faculty/getAll"
       );
       console.log("Fetched faculty list:", response.data);
       setFacultyList(response.data);
@@ -68,7 +84,7 @@ function ManagePayments() {
     try {
       setLoading(true);
       const response = await axios.get(
-        "http://localhost:3002/admin/payment/getAll"
+        "https://rcoe-remune-track.onrender.com/admin/payment/getAll"
       );
       console.log("Fetched payments:", response.data);
       setPayments(response.data);
@@ -89,7 +105,7 @@ function ManagePayments() {
     console.log("Payment ID : ", paymentId);
 
     try {
-      const url = `http://localhost:3002/payment/generate-pdf/${paymentId}`;
+      const url = `https://rcoe-remune-track.onrender.com/payment/generate-pdf/${paymentId}`;
 
       const response = await fetch(url, {
         method: "GET",

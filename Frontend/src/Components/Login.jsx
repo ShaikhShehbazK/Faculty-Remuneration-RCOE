@@ -27,8 +27,8 @@ function Login() {
     try {
       const url =
         loginRole === "admin"
-          ? "http://localhost:3002/admin/login"
-          : "http://localhost:3002/faculty/login";
+          ? "https://rcoe-remune-track.onrender.com/admin/login"
+          : "https://rcoe-remune-track.onrender.com/faculty/login";
 
       const response = await axios.post(url, payload);
 
@@ -243,7 +243,7 @@ function Login() {
     try {
       if (loginRole === "admin") {
         const response = await axios.post(
-          "http://localhost:3002/admin/login",
+          "https://rcoe-remune-track.onrender.com/admin/login",
           payload
         );
         if (response.data.token) {
@@ -256,7 +256,7 @@ function Login() {
         }
       } else {
         const response = await axios.post(
-          "http://localhost:3002/faculty/login",
+          "https://rcoe-remune-track.onrender.com/faculty/login",
           payload
         );
 

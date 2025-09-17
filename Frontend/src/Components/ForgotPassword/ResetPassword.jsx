@@ -15,7 +15,7 @@ const ResetPassword = () => {
     e.preventDefault();
     try {
       const res = await axios.post(
-        `http://localhost:3002/reset-password/${token}`,
+        `https://rcoe-remune-track.onrender.com/reset-password/${token}`,
         {
           newPassword,
         }

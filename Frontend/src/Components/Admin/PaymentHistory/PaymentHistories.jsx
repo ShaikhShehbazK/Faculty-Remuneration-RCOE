@@ -1,5 +1,15 @@
 import { useEffect, useState } from "react";
-import { Container, Row, Col, Card, Table, InputGroup, Form, Offcanvas, Button } from "react-bootstrap";
+import {
+  Container,
+  Row,
+  Col,
+  Card,
+  Table,
+  InputGroup,
+  Form,
+  Offcanvas,
+  Button,
+} from "react-bootstrap";
 import { FaSearch, FaBars } from "react-icons/fa";
 import AdminSidebar from "../../AdminSidebar";
 import { useNavigate } from "react-router-dom";
@@ -26,7 +36,7 @@ function PaymentHistories() {
     try {
       setLoading(true);
       const response = await axios.get(
-        "http://localhost:3002/admin/payment/getAll"
+        "https://rcoe-remune-track.onrender.com/admin/payment/getAll"
       );
       console.log("Fetched payments For Payment History Page : ");
       console.log(response.data);
@@ -41,21 +51,21 @@ function PaymentHistories() {
 
   // Filter payments based on search and filters
   const filteredPayments = payments.filter((payment) => {
-  const facultyName = payment.facultyId?.name?.toLowerCase() || "";
-  const designation = payment.facultyId?.designation?.toLowerCase() || "";
-  const academicYear = payment.academicYear?.toString().toLowerCase() || "";
+    const facultyName = payment.facultyId?.name?.toLowerCase() || "";
+    const designation = payment.facultyId?.designation?.toLowerCase() || "";
+    const academicYear = payment.academicYear?.toString().toLowerCase() || "";
 
-  const matchesSearch =
-    searchTerm === "" ||
-    facultyName.includes(searchTerm.toLowerCase()) ||
-    designation.includes(searchTerm.toLowerCase()) ||
-    academicYear.includes(searchTerm.toLowerCase());
+    const matchesSearch =
+      searchTerm === "" ||
+      facultyName.includes(searchTerm.toLowerCase()) ||
+      designation.includes(searchTerm.toLowerCase()) ||
+      academicYear.includes(searchTerm.toLowerCase());
 
-  const matchesFaculty =
-    filterFaculty === "" || payment.facultyId?._id === filterFaculty;
+    const matchesFaculty =
+      filterFaculty === "" || payment.facultyId?._id === filterFaculty;
 
-  return matchesSearch && matchesFaculty;
-});
+    return matchesSearch && matchesFaculty;
+  });
 
   /* const filteredPayments = payments.filter((payment) => {
     const facultyName = payment.facultyId.name.toLowerCase();
@@ -198,7 +208,7 @@ function PaymentHistories() {
                       {item.facultyId?.designation || "-"}
                     </td>
                     <td className="text-primary">{item.academicYear}</td>
-                    <td className="text-primary">{item.semesterType}</td> 
+                    <td className="text-primary">{item.semesterType}</td>
                     <td className="text-primary">
                       {new Date(item.createdAt).toLocaleDateString("en-GB", {
                         day: "2-digit",

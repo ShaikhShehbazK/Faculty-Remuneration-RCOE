@@ -50,7 +50,7 @@ function SubjectsManagement() {
     try {
       setLoading(true);
       const res = await api.get(
-        "http://localhost:3002/faculty/subject/getList"
+        "https://rcoe-remune-track.onrender.com/faculty/subject/getList"
       );
       setSubjects(res.data);
       setError("");
@@ -105,13 +105,13 @@ function SubjectsManagement() {
     try {
       if (editingSubject) {
         await api.put(
-          `http://localhost:3002/faculty/subject/update/${editingSubject}`,
+          `https://rcoe-remune-track.onrender.com/faculty/subject/update/${editingSubject}`,
           subjectData
         );
         alert("Subject updated successfully");
       } else {
         await api.post(
-          "http://localhost:3002/faculty/subject/create",
+          "https://rcoe-remune-track.onrender.com/faculty/subject/create",
           subjectData
         );
         alert("Subject created successfully");
@@ -129,7 +129,7 @@ function SubjectsManagement() {
     if (window.confirm(`Are you sure you want to delete ${subjectName}?`)) {
       try {
         await api.delete(
-          `http://localhost:3002/faculty/subject/delete/${subjectId}`
+          `https://rcoe-remune-track.onrender.com/faculty/subject/delete/${subjectId}`
         );
         alert("Subject deleted successfully");
         fetchSubjects();

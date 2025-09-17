@@ -28,7 +28,7 @@ function FacultyPaymentDetails() {
       try {
         setLoading(true);
         const paymentRes = await axios.get(
-          `http://localhost:3002/admin/payment/getSinglePayment/${id}/${academicYear}`
+          `https://rcoe-remune-track.onrender.com/admin/payment/getSinglePayment/${id}/${academicYear}`
         );
         console.log("Getting Payments for Faculty Payment Details Page ");
         console.log(paymentRes.data);
@@ -152,7 +152,7 @@ function FacultyPaymentDetails() {
                   const paymentId = remuneration?.payment?._id; // pick the paymentId for this semType
                   if (paymentId) {
                     window.open(
-                      `http://localhost:3002/payment/generate-pdf/${paymentId}`,
+                      `https://rcoe-remune-track.onrender.com/payment/generate-pdf/${paymentId}`,
                       "_blank"
                     );
                   } else {
@@ -196,7 +196,7 @@ function FacultyPaymentDetails() {
                   const paymentId = remuneration?.payment?._id; // pick the paymentId for this semType
                   if (paymentId) {
                     window.open(
-                      `http://localhost:3002/payment/generate-pdf/${paymentId}`,
+                      `https://rcoe-remune-track.onrender.com/payment/generate-pdf/${paymentId}`,
                       "_blank"
                     );
                   } else {

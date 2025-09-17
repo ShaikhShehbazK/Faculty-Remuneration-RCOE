@@ -13,10 +13,13 @@ function ForgotPassword() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const res = await axios.post("http://localhost:3002/forgot-password", {
-        email,
-        role,
-      });
+      const res = await axios.post(
+        "https://rcoe-remune-track.onrender.com/forgot-password",
+        {
+          email,
+          role,
+        }
+      );
       setMessage(res.data.message || "Reset link sent");
     } catch (error) {
       setMessage(

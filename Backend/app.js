@@ -18,7 +18,7 @@ const generatePDF = require("./routes/genereate-pdf");
 const forgetPasswordRouter = require("./routes/forgetPasswordRoute");
 const changePasswordRouter = require("./routes/changePasswordRoute");
 const checkRoleRoute = require("./routes/checkRole");
-const amountPayRouter = require("./routes/AmountpayRoute");
+const amountPayRouter = require("./routes/amountPayRoute");
 
 const app = express();
 
@@ -28,10 +28,17 @@ const app = express();
 //     credentials: true, // ✅ required for cookies
 //   })
 // );
+
+// app.use(
+//   cors({
+//     origin: "http://localhost:5173",
+//     credentials: true, // if using cookies / sessions
+//   })
+// );
 app.use(
   cors({
-    origin: "http://localhost:5173",
-    credentials: true, // if using cookies / sessions
+    origin: "https://rcoe-remune-track.netlify.app/", // ✅ your frontend URL
+    credentials: true, // ✅ required for cookies
   })
 );
 

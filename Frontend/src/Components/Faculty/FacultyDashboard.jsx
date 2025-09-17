@@ -43,7 +43,7 @@ function FacultyDashboard() {
     const fetchFacultyData = async () => {
       try {
         const facultyRes = await axios.get(
-          `http://localhost:3002/admin/faculty/getSingle/${facultyId}`
+          `https://rcoe-remune-track.onrender.com/admin/faculty/getSingle/${facultyId}`
         );
         console.log("Getting Faculty Details");
         console.log(facultyRes.data);
@@ -54,7 +54,7 @@ function FacultyDashboard() {
 
       try {
         const facultyPaymentRes = await axios.get(
-          `http://localhost:3002/admin/payment/getSinglePayment/${facultyId}`
+          `https://rcoe-remune-track.onrender.com/admin/payment/getSinglePayment/${facultyId}`
         );
         console.log("Getting Payment Details");
         console.log(facultyPaymentRes.data);
@@ -73,7 +73,17 @@ function FacultyDashboard() {
   if (!facultyData) return <div className="p-4">No faculty data found</div>;
 
   // Destructuring response from faculty details
-  const { name, email, phone, department, designation, employeeId, baseSalary, travelAllowance, assignedSubjects } = facultyData;
+  const {
+    name,
+    email,
+    phone,
+    department,
+    designation,
+    employeeId,
+    baseSalary,
+    travelAllowance,
+    assignedSubjects,
+  } = facultyData;
 
   const { createdAt, totalAmount } = facultyPayData.payments;
 
@@ -391,7 +401,7 @@ function FacultyDashboard() {
                                       const paymentId = semGroup[0]?.paymentId; // pick the paymentId for this semType
                                       if (paymentId) {
                                         window.open(
-                                          `http://localhost:3002/payment/generate-pdf/${paymentId}`,
+                                          `https://rcoe-remune-track.onrender.com/payment/generate-pdf/${paymentId}`,
                                           "_blank"
                                         );
                                       } else {
@@ -448,7 +458,6 @@ function FacultyDashboard() {
               <p className="text-muted mb-0">No remuneration records found</p>
             )}
           </Card> */}
-          
         </Col>
       </Row>
 

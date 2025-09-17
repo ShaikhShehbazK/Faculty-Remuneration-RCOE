@@ -1,12 +1,31 @@
 import { useEffect, useState } from "react";
-import { Container, Row, Col, Table, Button, Card, Badge, Spinner, Alert } from "react-bootstrap";
-import { FaPrint, FaFileInvoiceDollar, FaDownload, FaEye, FaCalculator, FaMoneyBillWave, FaInfoCircle, FaArrowLeft } from "react-icons/fa";
+import {
+  Container,
+  Row,
+  Col,
+  Table,
+  Button,
+  Card,
+  Badge,
+  Spinner,
+  Alert,
+} from "react-bootstrap";
+import {
+  FaPrint,
+  FaFileInvoiceDollar,
+  FaDownload,
+  FaEye,
+  FaCalculator,
+  FaMoneyBillWave,
+  FaInfoCircle,
+  FaArrowLeft,
+} from "react-icons/fa";
 import { useNavigate, useParams } from "react-router-dom";
 import axios from "axios";
 import api from "../../../utils/api";
 
 function SubjectRemunerationDetails() {
-  const { id, subjectId , academicYear} = useParams(); // id = facultyId
+  const { id, subjectId, academicYear } = useParams(); // id = facultyId
   const navigate = useNavigate();
 
   const [loading, setLoading] = useState(true);
@@ -17,10 +36,14 @@ function SubjectRemunerationDetails() {
     const fetchFacultyDetails = async () => {
       try {
         setLoading(true);
-        const res = await axios.get(`http://localhost:3002/admin/payment/getSinglePayment/${id}/${subjectId}/${academicYear}`);
-        console.log("Fetched Subject Payments for SubjectRemunerationDetails page :");
+        const res = await axios.get(
+          `https://rcoe-remune-track.onrender.com/admin/payment/getSinglePayment/${id}/${subjectId}/${academicYear}`
+        );
+        console.log(
+          "Fetched Subject Payments for SubjectRemunerationDetails page :"
+        );
         console.log(res.data);
-        
+
         // Extract single subject breakdown from API
         const breakdownItem = res.data.breakdown[0]; // Only 1 because subjectId was passed
 
@@ -30,7 +53,7 @@ function SubjectRemunerationDetails() {
           department: res.data.department,
           subjectName: breakdownItem.subjectName,
           academicYear: breakdownItem.academicYear,
-          semesterType: breakdownItem.semesterType, 
+          semesterType: breakdownItem.semesterType,
           semester: breakdownItem.semester,
           total: breakdownItem.subjectTotal,
           referenceNumber: `REF-${Date.now()}`,
