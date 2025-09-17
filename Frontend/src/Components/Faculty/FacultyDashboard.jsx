@@ -30,16 +30,20 @@ function FacultyDashboard() {
   const [facultyData, setFacultyData] = useState(null);
   const [facultyPayData, setFacultyPayData] = useState(null);
   const [loading, setLoading] = useState(true);
-  const token = localStorage.getItem("token");
-  const header = {
-    headers: {
-      Authorization: `Bearer ${token}`, // ✅ Pass the token in Authorization header
-    },
-  };
+  // const token = localStorage.getItem("token");
+  // const header = {
+  //   headers: {
+  //     Authorization: `Bearer ${token}`, // ✅ Pass the token in Authorization header
+  //   },
+  // };
   useEffect(() => {
     const facultyId = localStorage.getItem("facultyId");
     const token = localStorage.getItem("token");
-
+    const header = {
+      headers: {
+        Authorization: `Bearer ${token}`, // ✅ Pass the token in Authorization header
+      },
+    };
     if (!facultyId || !token) {
       console.error("No facultyId or token found in localStorage");
       return;
