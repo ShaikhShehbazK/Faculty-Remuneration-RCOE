@@ -23,24 +23,31 @@ const facultySchema = new mongoose.Schema(
       required: true,
     },
 
-    // ✅ Grouped subject assignments per year + semesterType 
+    // ✅ Grouped subject assignments per year + semesterType
     assignedSubjects: [
       {
         academicYear: { type: String, required: true }, // e.g. "2025-26"
         semesters: [
           {
-            semesterType: { type: String, enum: ["Odd", "Even"], required: true },
+            semesterType: {
+              type: String,
+              enum: ["Odd", "Even"],
+              required: true,
+            },
             subjects: [
               {
-                subjectId: { type: mongoose.Schema.Types.ObjectId, ref: "Subject" },
+                subjectId: {
+                  type: mongoose.Schema.Types.ObjectId,
+                  ref: "Subject",
+                },
                 name: String,
-                semester: Number
-              }
-            ]
-          }
-        ]
-      }
-    ]
+                semester: Number,
+              },
+            ],
+          },
+        ],
+      },
+    ],
   },
   { timestamps: true }
 );

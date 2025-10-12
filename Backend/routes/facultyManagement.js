@@ -23,8 +23,8 @@ facultyManagement.put(
 // Remove asssigned subjects
 facultyManagement.put(
   "/:id/remove-subject",
-  jwtAuthMiddleware,
-  isAdmin,
+  /* jwtAuthMiddleware,
+  isAdmin, */
   facultyManagementC.removeSubject
 );
 
@@ -39,7 +39,8 @@ facultyManagement.get(
 // ✅ Get Single Faculty by ID
 facultyManagement.get(
   "/getSingle/:id",
-  jwtAuthMiddleware,
+  /* jwtAuthMiddleware,
+  isAdmin, */
   facultyManagementC.getSingleFaculty
 );
 

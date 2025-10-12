@@ -1,4 +1,3 @@
-
 const Subject = require("../models/subjects");
 
 /* exports.getSubjects = async (req, res) => {
@@ -13,7 +12,6 @@ const Subject = require("../models/subjects");
 
 exports.getSubjects = async (req, res) => {
   try {
-
     // ✅ Filter by semester and/or department
     const filters = {};
 

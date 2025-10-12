@@ -26,7 +26,7 @@ exports.postLogin = async (req, res, next) => {
       role: faculty.role,
     };
     const token = generateToken(payload);
-    res.json({ message: "login successfully", token , id: faculty._id }); // 👈 ADDed this id: faculty._id
+    res.json({ message: "login successfully", token, id: faculty._id }); // 👈 ADDed this id: faculty._id
   } catch (err) {
     console.log("Error while logging in : ", err);
     res.status(500).json({ error: "Internal server error" });

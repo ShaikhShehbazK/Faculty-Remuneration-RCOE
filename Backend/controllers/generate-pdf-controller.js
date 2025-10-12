@@ -23,7 +23,7 @@ exports.getPDF = async (req, res) => {
     }
     const doc = new PDFDocument({ size: "A4", margin: 40 });
     const safeName = payment.facultyId.name.replace(/\s+/g, "_");
-    const fileName = `Remuneration_Slip_${safeName}_${payment.semesterType}_${payment.academicYear}.pdf`;
+    const fileName = `Slip_${safeName}_${payment.semesterType}_${payment.academicYear}.pdf`;
 
     res.setHeader("Content-Type", "application/pdf");
     res.setHeader("Content-Disposition", `attachment; filename=${fileName}`);
@@ -282,19 +282,19 @@ exports.getPDF = async (req, res) => {
       .fillColor("black");
 
     doc
-      .font("Helvetica-Bold")
+      /* .font("Helvetica-Bold")
       .fontSize(12)
       .fillColor("#b9770e")
       .text("Base Salary:", 60, salaryBoxY + 10)
       .font("Helvetica")
       .fillColor("black")
-      .text(`Rs. ${payment.baseSalary.toFixed(2)}`, 180, salaryBoxY + 10)
+      .text(`Rs. ${payment.baseSalary.toFixed(2)}`, 180, salaryBoxY + 10) */
       .font("Helvetica-Bold")
       .fillColor("#b9770e")
-      .text("Travel Allowance:", 60, salaryBoxY + 28)
+      .text("Travel Allowance:", 60, salaryBoxY + 10)
       .font("Helvetica")
       .fillColor("black")
-      .text(`Rs. ${payment.travelAllowance.toFixed(2)}`, 180, salaryBoxY + 28)
+      .text(`Rs. ${payment.travelAllowance.toFixed(2)}`, 180, salaryBoxY + 10)
       .font("Helvetica-Bold")
       .fillColor("#b9770e")
       .text("Duties Total:", 320, salaryBoxY + 10)
@@ -575,7 +575,8 @@ exports.getYearPDF = async (req, res) => {
     const allPaid = payments.every((p) => p.status === "paid");
     if (!allPaid) {
       return res.status(400).json({
-        message: "Slip can only be generated after all semester payments are successful",
+        message:
+          "Slip can only be generated after all semester payments are successful",
       });
     }
 
@@ -870,8 +871,8 @@ exports.getYearPDF = async (req, res) => {
       : 0;
 
     // Salary Totals
-    const totalBase =
-      (oddPayment?.baseSalary || 0) + (evenPayment?.baseSalary || 0);
+    /*     const totalBase =
+      (oddPayment?.baseSalary || 0) + (evenPayment?.baseSalary || 0); */
     const totalTravel =
       (oddPayment?.travelAllowance || 0) + (evenPayment?.travelAllowance || 0);
     const totalRem =
@@ -890,19 +891,19 @@ exports.getYearPDF = async (req, res) => {
       .fillAndStroke("#fef9e7", "#f7ca18")
       .fillColor("black");
     doc
-      .font("Helvetica-Bold")
+      /* .font("Helvetica-Bold")
       .fontSize(12)
       .fillColor("#b9770e")
       .text("Base Salary:", 60, salaryBoxY + 10)
       .font("Helvetica")
       .fillColor("black")
-      .text(`Rs. ${totalBase.toFixed(2)}`, 180, salaryBoxY + 10)
+      .text(`Rs. ${totalBase.toFixed(2)}`, 180, salaryBoxY + 10) */
       .font("Helvetica-Bold")
       .fillColor("#b9770e")
-      .text("Travel Allowance:", 60, salaryBoxY + 28)
+      .text("Travel Allowance:", 60, salaryBoxY + 10)
       .font("Helvetica")
       .fillColor("black")
-      .text(`Rs. ${totalTravel.toFixed(2)}`, 180, salaryBoxY + 28)
+      .text(`Rs. ${totalTravel.toFixed(2)}`, 180, salaryBoxY + 10)
       .font("Helvetica-Bold")
       .fillColor("#b9770e")
       .text("Duties Total:", 320, salaryBoxY + 10)

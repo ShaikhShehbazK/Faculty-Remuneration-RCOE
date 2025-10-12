@@ -5,6 +5,9 @@ const generatePDF = express.Router();
 
 generatePDF.get("/generate-pdf/:paymentId", pdfController.getPDF);
 
-generatePDF.get("/generate-pdf/:facultyId/:academicYear", pdfController.getYearPDF);
+generatePDF.get(
+  "/generate-pdf/:facultyId/:academicYear",
+  pdfController.getYearPDF
+);
 
 module.exports = generatePDF;
