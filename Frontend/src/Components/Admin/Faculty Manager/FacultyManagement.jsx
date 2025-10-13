@@ -254,7 +254,7 @@ function FacultyManagement() {
                         </span>
                       </td>
                       <td>{faculty.email}</td>
-                      <td>Faculty.phone</td>
+                      <td>{faculty.phone}</td>
                       <td>
                         <Button
                           variant="link"
