@@ -28,7 +28,7 @@ function FacultyDashboard() {
   const handleSidebarClose = () => setShowSidebar(false);
 
   const [facultyData, setFacultyData] = useState(null);
-  const [facultyPayData, setFacultyPayData] = useState(null);
+  // const [facultyPayData, setFacultyPayData] = useState(null);
   const [loading, setLoading] = useState(true);
   // const token = localStorage.getItem("token");
   // const header = {
@@ -60,26 +60,44 @@ function FacultyDashboard() {
         setFacultyData(facultyRes.data);
       } catch (err) {
         console.error("Error fetching faculty data:", err);
-      }
-
-      try {
-        const facultyPaymentRes = await axios.get(
-          `https://rcoe-remune-track.onrender.com/admin/payment/getSinglePayment/${facultyId}`
-        );
-        console.log("Getting Payment Details");
-        console.log(facultyPaymentRes.data);
-        setFacultyPayData(facultyPaymentRes.data);
-      } catch (err) {
-        console.error("Error fetching faculty data:", err);
       } finally {
         setLoading(false);
       }
+
+      // try {
+      //   const facultyPaymentRes = await axios.get(
+      //     `https://rcoe-remune-track.onrender.com/admin/payment/getSinglePayment/${facultyId}`
+      //   );
+      //   console.log("Getting Payment Details");
+      //   console.log(facultyPaymentRes.data);
+      //   setFacultyPayData(facultyPaymentRes.data);
+      // } catch (err) {
+      //   console.error("Error fetching faculty data:", err);
+      // } finally {
+      //   setLoading(false);
+      // }
     };
 
     fetchFacultyData();
   }, []);
 
-  if (loading) return <div className="p-4">Loading Dashboard...</div>;
+  if (loading)
+    return (
+      <div
+        className="d-flex flex-column align-items-center justify-content-center p-4"
+        style={{ height: "100%" }}
+      >
+        <div
+          className="spinner-border text-primary mb-3"
+          style={{ width: "3rem", height: "3rem" }}
+          role="status"
+        >
+          <span className="visually-hidden">Loading...</span>
+        </div>
+        <p className="text-muted fw-semibold">Fetching your dashboard...</p>
+      </div>
+    );
+
   if (!facultyData) return <div className="p-4">No faculty data found</div>;
 
   // Destructuring response from faculty details
@@ -95,7 +113,7 @@ function FacultyDashboard() {
     assignedSubjects,
   } = facultyData;
 
-  const { createdAt, totalAmount } = facultyPayData.payments;
+  // const { createdAt, totalAmount } = facultyPayData.payments;
 
   return (
     <Container fluid className="p-4 bg-light min-vh-100">
@@ -149,7 +167,7 @@ function FacultyDashboard() {
 
           {/* Payment Overview Cards */}
           <Row className="mb-4">
-            <Col md={4} className="mb-3">
+            {/* <Col md={4} className="mb-3">
               <Card className="shadow-sm border-0 rounded-4 bg-white">
                 <Card.Body className="p-4">
                   <div className="d-flex align-items-center">
@@ -163,7 +181,7 @@ function FacultyDashboard() {
                   </div>
                 </Card.Body>
               </Card>
-            </Col>
+            </Col> */}
             <Col md={4} className="mb-3">
               <Card className="shadow-sm border-0 rounded-4 bg-white">
                 <Card.Body className="p-4">

@@ -8,6 +8,7 @@ import {
   Alert,
   Card,
   Badge,
+  InputGroup,
 } from "react-bootstrap";
 import {
   FaArrowLeft,
@@ -48,7 +49,7 @@ function AddFacultyForm() {
     email: "",
     password: "",
     phone: "",
-    baseSalary: "",
+    // baseSalary: "",
     travelAllowance: "",
     academicYear: "",
     semesterType: "",
@@ -201,7 +202,7 @@ function AddFacultyForm() {
         phone: formData.phone,
         department: formData.department,
         designation: formData.designation,
-        baseSalary: Number(formData.baseSalary),
+        // baseSalary: Number(formData.baseSalary),
         travelAllowance: Number(formData.travelAllowance),
         academicAssignments, // ✅ final nested structure
       };
@@ -223,7 +224,7 @@ function AddFacultyForm() {
         email: "",
         password: "",
         phone: "",
-        baseSalary: "",
+        // baseSalary: "",
         travelAllowance: "",
         academicYear: "",
         semesterType: "",
@@ -408,7 +409,7 @@ function AddFacultyForm() {
                 <FaUserPlus className="text-success" />
                 <h5 className="fw-bold mb-0">Remuneration Details</h5>
               </div>
-              <Form.Group className="mb-3">
+              {/* <Form.Group className="mb-3">
                 <Form.Label>Base Salary</Form.Label>
                 <Form.Control
                   name="baseSalary"
@@ -419,18 +420,21 @@ function AddFacultyForm() {
                   placeholder="Enter Base Salary"
                   required
                 />
-              </Form.Group>
+              </Form.Group> */}
               <Form.Group className="mb-3">
                 <Form.Label>Travel Allowance</Form.Label>
-                <Form.Control
-                  name="travelAllowance"
-                  value={formData.travelAllowance}
-                  onChange={handleChange}
-                  type="number"
-                  min="0"
-                  placeholder="Enter Travel Allowance"
-                  required
-                />
+                <InputGroup>
+                  <InputGroup.Text>₹</InputGroup.Text>
+                  <Form.Control
+                    name="travelAllowance"
+                    value={formData.travelAllowance}
+                    onChange={handleChange}
+                    type="number"
+                    min="0"
+                    placeholder="Enter Travel Allowance"
+                    required
+                  />
+                </InputGroup>
               </Form.Group>
             </Col>
 
@@ -462,13 +466,26 @@ function AddFacultyForm() {
               </Form.Group>
               <Form.Group className="mb-3">
                 <Form.Label>Phone</Form.Label>
-                <Form.Control
-                  name="phone"
-                  value={formData.phone}
-                  onChange={handleChange}
-                  placeholder="Enter contact number"
-                  required
-                />
+                <InputGroup>
+                  <InputGroup.Text>+91</InputGroup.Text>
+                  <Form.Control
+                    type="tel"
+                    name="phone"
+                    value={formData.phone}
+                    onChange={(e) => {
+                      const value = e.target.value;
+                      if (value.length <= 10) {
+                        setFormData({
+                          ...formData,
+                          phone: value.replace(/\D/g, ""),
+                        });
+                      }
+                    }}
+                    placeholder="Enter 10 digit contact number"
+                    maxLength="10"
+                    required
+                  />
+                </InputGroup>
               </Form.Group>
 
               {/* ✅ Academic Year + Semester Type */}
