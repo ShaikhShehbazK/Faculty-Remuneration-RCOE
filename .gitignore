@@ -1,6 +1,11 @@
 # Environment variables
 .env
 .env.*
+Backend/.env
+Frontend/.env
+Backend/.env.*
+Frontend/.env.*
+
 
 
 # Logs
