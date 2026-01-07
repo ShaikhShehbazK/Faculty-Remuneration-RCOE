@@ -32,7 +32,7 @@ const app = express();
 // );
 app.use(
   cors({
-    origin: process.env.FRONTEND_DEV_URL,
+    origin: "https://remune-track.netlify.app",
     credentials: true, // if using cookies / sessions
   })
 );
