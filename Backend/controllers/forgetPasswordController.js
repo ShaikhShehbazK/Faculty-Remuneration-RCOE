@@ -5,11 +5,17 @@ const bcrypt = require("bcryptjs");
 
 exports.forgotPassword = async (req, res) => {
   const { email, role } = req.body;
+  console.log("Forgot password request:", email, role);
   const Model = role === "admin" ? Admin : Faculty;
 
   const user = await Model.findOne({ email });
-  if (!user) return res.status(404).json({ message: "User not found" });
+  console.log("User found in DB:", user);
+  // if (!user) return res.status(404).json({ message: "User not found" });
 
+  if (!user) {
+    console.log("USER NOT FOUND IN COLLECTION:", Model.collection.name);
+    return res.status(404).json({ message: "User not found in database" });
+  }
   // const otp = otpGenerator.generate(6, {
   //   upperCase: false,
   //   specialChars: false,

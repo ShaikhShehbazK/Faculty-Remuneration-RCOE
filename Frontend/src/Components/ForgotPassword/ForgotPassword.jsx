@@ -23,9 +23,13 @@ export default function ForgotPassword() {
       localStorage.setItem("resetRole", role);
       toast.success("OTP sent to your email");
       navigate("/verify-otp");
-    } catch {
-      toast.error("User not found");
+    } catch (err) {
+      console.log("FORGOT PASSWORD ERROR:", err?.response?.data);
+      toast.error(err?.response?.data?.message || "Server error");
     }
+    // catch {
+    //   toast.error("User not found");
+    // }
     setLoading(false);
   };
 
